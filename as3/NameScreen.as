@@ -24,6 +24,7 @@ package as3 {
 		function submit():void {
 			MainApp.socket.writeUTFBytes("NAME:" + input_NAME.text + charSplit + "INIT:" + input_INITIALS.text + charSplit);
 			MainApp.socket.flush();
+			trace(">Sent name and initials to the server");
 			clearScreen();
 			dispose();
 			addChild(new LobbyScreen());

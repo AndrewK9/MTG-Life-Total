@@ -109,7 +109,7 @@ rl.on('close', function(){
 function newClientBroadcast(clientNumb, clientName, clientInit){
 	var msg = "";
 	msg += "NP:" + clientInit + " - " + clientName + charSplit;
-	console.log(">Clients lobbies are updated with a new player");
+	console.log(">Client lobbies have been updated with a new player");
 	for(var i = 0; i < clients.length; i++){
 		clients[i].write(msg);
 	}
@@ -133,25 +133,38 @@ function clientHasLeft(){
 }
 
 function launchMatch(){
-	var msg = "START:";
+	var msg = "BEGIN:" + charSplit;
 	for(var i = 0; i < clients.length; i++){
 		clients[i].write(msg);
 	}
 	allowNewPlayers = false;
-	console.log(">The match has started");
+	loadPlayerData();
+	sendStartingHealth();
+}
+
+function loadPlayerData(){
 	for(var i = 0; i < clients.length; i++){
 		clients[i].life = startingLife;
-		sendStartingData(clients[i].number, clients[i].initials, clients[i].name, , clients[i].life);
+		clients[i].infect = 0;
+		sendStartingData(clients[i].number, clients[i].initials, clients[i].name, clients[i].life, clients[i].infect);
 	}
 	console.log(">All clients have the player information");
 	console.log("==========[THE MATCH HAS STARTED]==========");
 }
 
 //sends clients the starting info as long as their client.number isn't the number of the current clients info being sent
-function sendStartingData(clientToIgnore, clientInit, clientName, clientLife){
+function sendStartingData(clientToIgnore, clientInit, clientName, clientLife, clientInfect){
 	var msg = "";
+	msg += "PINIT:"+clientInit+charSplit+"PNAME:"+clientName+charSplit+"PLIFE:"+clientLife+charSplit+"PINFT:"+clientInfect+charSplit+"FIN:"+charSplit;
 	for(var i = 0; i < clients.length; i++){
-		msg += "NP:" + clientInit + "|" + clientName + "|" + clientLife + charSplit;
 		if(clients[i].number != clientToIgnore) clients[i].write(msg);
+	}
+}
+
+//sends starting health to the players
+function sendStartingHealth(){
+	var msg = "HEALTH:" + startingLife + charSplit;
+	for(var i = 0; i < clients.length; i++){
+		clients[i].write(msg);
 	}
 }

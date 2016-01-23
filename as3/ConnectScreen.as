@@ -21,19 +21,23 @@ package as3 {
 		}
 		function handleData(e:ProgressEvent):void {
 			buffer += MainApp.socket.readUTFBytes(MainApp.socket.bytesAvailable);
-			trace(buffer);
 			var messages:Array = buffer.split(charSplit);
 			buffer = messages.pop();
 
+			trace(">Incoming Messages:");
+			trace(">" + messages);
+			trace(">End of Incoming Messages");
+
 			for(var i = 0; i < messages.length; i++){
 				var msg:String = messages[i];
-     			trace(messages[i]);
             	if(msg.indexOf("EXIT:") == 0){
+            		trace(">Sever returned EXIT");
             	    clearScreen();
             	    dispose();
             	    addChild(new MainApp());
             	}
             	if(msg.indexOf("GOOD:") == 0){
+            		trace(">Server was taking new players, moving to name screen");
             	    clearScreen();
             	    dispose();
             	    addChild(new NameScreen());
@@ -48,6 +52,7 @@ package as3 {
 		}
 		function connect():void {
 			MainApp.socket.connect(input_IP.text, int(input_PORT.text));
+			trace(">Sent server info");
 		}		
 		public function dispose():void {
 			input_IP.removeEventListener(KeyboardEvent.KEY_DOWN, handleKey);

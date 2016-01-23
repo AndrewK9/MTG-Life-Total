@@ -20,23 +20,30 @@ package as3 {
 			buffer += MainApp.socket.readUTFBytes(MainApp.socket.bytesAvailable);
 			var messages:Array = buffer.split(charSplit);
 			buffer = messages.pop();
+			trace(">Incoming Lobby Messages:");
+			trace(">" + messages);
+			trace(">End of Incoming Lobby Messages");
 			
 			for(var i = 0; i < messages.length; i++){
 				var msg:String = messages[i];
             
             	if(msg.indexOf("NP:") == 0){
             	    var player = msg.substr(3);
+            	    trace(">Added " + player + " to the lobby");
             	    txt_LOBBY.appendText(player + charSplit);
             	}
             	if(msg.indexOf("LP:") == 0){
             	    txt_LOBBY.text = "";
+            	    trace(">Cleared the lobby");
             	}
             	if(msg.indexOf("EXIT:") == 0){
             	    clearScreen();
             	    dispose();
+            	    trace(">Server said to exit and restart");
             	    addChild(new MainApp());
             	}
-            	if(msg.indexOf("START:") == 0){
+            	if(msg.indexOf("BEGIN:") == 0){
+            		trace(">Someone hit the start button")
             	    clearScreen();
             	    dispose();
             	    addChild(new GameScreen());
@@ -49,11 +56,10 @@ package as3 {
 		function startMatch():void {
 			MainApp.socket.writeUTFBytes("START:" + charSplit);
 			MainApp.socket.flush();
-			clearScreen();
-			//addChild(new MatchScreen());
 		}		
 		public function dispose():void {
 			bttn_START.removeEventListener(MouseEvent.CLICK, handleClick);
+			MainApp.socket.removeEventListener(ProgressEvent.SOCKET_DATA, handleData);
 			trace("=============[Unloaded Lobby Events]==============");
 		}
 		public function clearScreen(){
