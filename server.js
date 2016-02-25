@@ -5,6 +5,7 @@ var net = require("net");
 var clientNumb = 0;
 var allowNewPlayers = true;
 var startingLife = 20;
+var numOfDeadClients = 0;
 var readline = require('readline');
 
 var rl = readline.createInterface(process.stdin, process.stdout);
@@ -85,7 +86,20 @@ rl.on('close', function(){
 					}
 				}
 	
+				//a player started the match
 				if(msg.indexOf("START:") == 0){
+					launchMatch();
+				}
+
+				//a player sent an update message
+				if(msg.indexOf("U:") == 0){
+					var playerUpdate = msg.substr(2);
+					adjustPlayerData(client.number, playerUpdate)
+				}
+
+				//a player wanted a rematch
+				if(msg.indexOf("RE:") == 0){
+					console.log("==========[SETTING UP THE REMATCH]==========");
 					launchMatch();
 				}
 			}
@@ -138,8 +152,8 @@ function launchMatch(){
 		clients[i].write(msg);
 	}
 	allowNewPlayers = false;
-	loadPlayerData();
-	sendStartingHealth();
+	setTimeout(loadPlayerData, 500);
+	setTimeout(sendStartingHealth, 1000);
 }
 
 function loadPlayerData(){
@@ -164,6 +178,82 @@ function sendStartingData(clientToIgnore, clientInit, clientName, clientLife, cl
 //sends starting health to the players
 function sendStartingHealth(){
 	var msg = "HEALTH:" + startingLife + charSplit;
+	for(var i = 0; i < clients.length; i++){
+		clients[i].write(msg);
+	}
+}
+
+//this funciton chagnes the players HP or I stats
+function adjustPlayerData(clientNum, updateType){
+	for(var i = 0; i < clients.length; i++){
+		//once we find what client we need up update, update them
+		if(clients[i].number == clientNum){
+			if(updateType == "PHP") {
+				clients[i].life++;
+				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just GAINED LIFE");
+			}
+			if(updateType == "MHP") {
+				clients[i].life--;
+				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just LOST LIFE");
+			}
+			if(updateType == "PI") {
+				clients[i].infect++;
+				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just GAINED AN INFECT POINT");
+			}
+			if(updateType == "MI") {
+				clients[i].infect--;
+				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just LOST AN INFECT POINT");
+			}
+			sendUpdate(clients[i].number, clients[i].initials, clients[i].name, clients[i].life, clients[i].infect);
+		}
+	}
+}
+//once we update the players info, send out all the new stats to every player
+function sendUpdate(clientToIgnore, clientInit, clientName, clientLife, clientInfect){
+	//if the game isn't over, send the update
+	for(var i = 0; i < clients.length; i++){
+		var msg = "";
+		msg += "PINIT:"+clientInit+charSplit+"PNAME:"+clientName+charSplit+"PLIFE:"+clientLife+charSplit+"PINFT:"+clientInfect+charSplit+"U:"+charSplit;
+		
+		if(clients[i].number != clientToIgnore) clients[i].write(msg);
+		
+		if(clients[i].number == clientToIgnore){
+			msg = "PLIFE:"+clientLife+charSplit+"PINFT:"+clientInfect+charSplit+"UU:"+charSplit;
+			clients[i].write(msg);
+		}
+	}
+	checkForDeaths();
+}
+
+function checkForDeaths(){
+	numOfDeadClients = 0;
+	for(var i = 0; i < clients.length; i++){
+		if(clients[i].life <= 0 || clients[i].infect >= 10) numOfDeadClients++;
+	}
+	if(numOfDeadClients >= clients.length - 1) {
+		gameOver();
+		setTimeout(checkForWinner, 500);
+		console.log("==========[THE MATCH HAS ENDED]==========");
+	}
+}
+
+function checkForWinner(){
+	for(var i = 0; i < clients.length; i++){
+		if(clients[i].life > 0 && clients[i].infect < 10) announceWinner(clients[i].name, clients[i].initials);
+	}
+}
+
+function gameOver(){
+	var msg = "";
+	msg += "GMOV:"+charSplit;
+	for(var i = 0; i < clients.length; i++){
+		clients[i].write(msg);
+	}
+}
+
+function announceWinner(winnersName, winnersInitials){
+	var msg = "";
+	msg += "PINIT:"+winnersInitials+charSplit+"PNAME:"+winnersName+charSplit+"WIN:"+charSplit;
 	for(var i = 0; i < clients.length; i++){
 		clients[i].write(msg);
 	}

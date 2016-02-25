@@ -17,16 +17,18 @@ package as3 {
 		var newPlayerNumber = -1;
 		var playerPos0:Object = {x:18,y:52};
 		var playerPos1:Object = {x:250,y:52};
-		var playerPos2:Object = {x:18,y:198};
-		var playerPos3:Object = {x:250,y:198};
-		var playerPos4:Object = {x:18,y:344};
-		var playerPos5:Object = {x:250,y:344};
+		var playerPos2:Object = {x:18,y:164};
+		var playerPos3:Object = {x:250,y:164};
+		var playerPos4:Object = {x:18,y:276};
+		var playerPos5:Object = {x:250,y:276};
+		var playerPos6:Object = {x:18,y:388};
+		var playerPos7:Object = {x:250,y:388};
 		
 		public function GameScreen() {
-			bttn_hp_MINUS.addEventListener(MouseEvent.CLICK, handleClick);
-			bttn_hp_PLUS.addEventListener(MouseEvent.CLICK, handleClick);
-			bttn_infect_MINUS.addEventListener(MouseEvent.CLICK, handleClick);
-			bttn_infect_PLUS.addEventListener(MouseEvent.CLICK, handleClick);
+			bttn_hp_MINUS.addEventListener(MouseEvent.CLICK, handleClick("MHP"));
+			bttn_hp_PLUS.addEventListener(MouseEvent.CLICK, handleClick("PHP"));
+			bttn_infect_MINUS.addEventListener(MouseEvent.CLICK, handleClick("MI"));
+			bttn_infect_PLUS.addEventListener(MouseEvent.CLICK, handleClick("PI"));
 			MainApp.socket.addEventListener(ProgressEvent.SOCKET_DATA, handleData);
 			trace("=============[Loaded Game Events]==============");
 		}
@@ -61,44 +63,49 @@ package as3 {
             	    var info2 = msg.substr(6);
             	    playerInfect = info2;
             	 }
-            	 if(msg.indexOf("FIN:") == 0){//Used whe the game starts
-            	 	newPlayerNumber++;
-            	    var newPlayer:PlayerObj = new PlayerObj(playerInit, playerName, playerLife, playerInfect);
-            	    addChild(newPlayer);
-            	    players.push(newPlayer);
-            	    trace(">New Player Loaded");
-            	    trace("Initials: "+newPlayer.initials+" Name: "+newPlayer.pname+" Life: "+newPlayer.life+" Infect: "+newPlayer.infect);
-            	    newPlayer.txt_otherplayers_INITIALS.text = newPlayer.initials;
-            	    newPlayer.txt_otherplayers_HEALTH.text = newPlayer.life;
-            	    newPlayer.txt_otherplayers_INFECT.text = newPlayer.infect;
+                   if(msg.indexOf("FIN:") == 0){//Used whe the game starts
+                        newPlayerNumber++;
+                      var newPlayer:PlayerObj = new PlayerObj(newPlayerNumber, playerInit, playerName, playerLife, playerInfect);
+                      addChild(newPlayer);
+                      players.push(newPlayer);
+                      trace(">New Player Loaded");
+                      trace("Initials: "+newPlayer.initials+" Name: "+newPlayer.pname+" Life: "+newPlayer.life+" Infect: "+newPlayer.infect);
 
-            	    switch(newPlayerNumber){
-            	    	case 0:
-            	    		newPlayer.x = playerPos0.x;
-            	    		newPlayer.y = playerPos0.y;
-            	    		break;
-            	    	case 1:
-            	    		newPlayer.x = playerPos1.x;
-            	    		newPlayer.y = playerPos1.y;
-            	    		break;
-            	    	case 2:
-            	    		newPlayer.x = playerPos2.x;
-            	    		newPlayer.y = playerPos2.y;
-            	    		break;
-            	    	case 3:
-            	    		newPlayer.x = playerPos3.x;
-            	    		newPlayer.y = playerPos3.y;
-            	    		break;
-            	    	case 4:
-            	    		newPlayer.x = playerPos4.x;
-            	    		newPlayer.y = playerPos4.y;
-            	    		break;
-            	    	case 5:
-            	    		newPlayer.x = playerPos5.x;
-            	    		newPlayer.y = playerPos5.y;
-            	    		break;
-            	    }
-            	 }
+                      switch(newPlayerNumber){
+                        case 0:
+                              newPlayer.x = playerPos0.x;
+                              newPlayer.y = playerPos0.y;
+                              break;
+                        case 1:
+                              newPlayer.x = playerPos1.x;
+                              newPlayer.y = playerPos1.y;
+                              break;
+                        case 2:
+                              newPlayer.x = playerPos2.x;
+                              newPlayer.y = playerPos2.y;
+                              break;
+                        case 3:
+                              newPlayer.x = playerPos3.x;
+                              newPlayer.y = playerPos3.y;
+                              break;
+                        case 4:
+                              newPlayer.x = playerPos4.x;
+                              newPlayer.y = playerPos4.y;
+                              break;
+                        case 5:
+                              newPlayer.x = playerPos5.x;
+                              newPlayer.y = playerPos5.y;
+                              break;
+                        case 6:
+                              newPlayer.x = playerPos6.x;
+                              newPlayer.y = playerPos6.y;
+                              break;
+                        case 7:
+                              newPlayer.x = playerPos7.x;
+                              newPlayer.y = playerPos7.y;
+                              break;
+                      }
+                   }
 
             	if(msg.indexOf("LP:") == 0){
             		    //TO-DO:Kill off player who left
@@ -115,18 +122,63 @@ package as3 {
             		ourHealth = parseInt(incomingHealth);
             		trace("I set the starting life to " + incomingHealth);
             	}
+
+           		//updates other players
+            	if(msg.indexOf("U:")==0){
+            		for(var j = 0; j < players.length; j++){
+            			if(playerInit == players[j].initials && playerName == players[j].pname){
+            				players[j].update(playerLife, playerInfect);
+            			}
+            		}
+            	}
+            	//updates yourself
+            	if(msg.indexOf("UU:")==0){
+                if(playerLife <= 0 || playerInfect >= 10){
+                  txt_player_HEALTH.text = "RIP";
+                  txt_player_INFECT.text = "RIP";
+                }else{
+            		  txt_player_HEALTH.text = playerLife.toString();
+            		  txt_player_INFECT.text = playerInfect.toString();
+                }
+            	}
+              if(msg.indexOf("GMOV:")==0){
+                trace(">Someone won the game!");
+                clearScreen();
+                dispose();
+                addChild(new WinScreen());
+              }
 			}		
 		}
-		function handleClick(e:MouseEvent):void {
-			//TO-DO:Take in data and use a switch to send updates to the server
+		function handleClick(type:String):Function {
+			return function(e:MouseEvent):void{
+				var msg = "";
+					switch(type){
+						case "PHP":
+							msg = "U:PHP";
+							break;
+						case "MHP":
+							msg = "U:MHP";
+							break;
+						case "MI":
+							msg = "U:MI";
+							break;
+						case "PI":
+							msg = "U:PI";
+							break;
+					}
+	
+				MainApp.socket.writeUTFBytes(msg + charSplit);
+				MainApp.socket.flush();
+				trace(">Sent an update to the server: " + msg);
+			};
 		}	
 		public function dispose():void {
 		   	bttn_hp_MINUS.removeEventListener(MouseEvent.CLICK, handleClick);
-			bttn_hp_PLUS.removeEventListener(MouseEvent.CLICK, handleClick);
+			  bttn_hp_PLUS.removeEventListener(MouseEvent.CLICK, handleClick);
 	   		bttn_infect_MINUS.removeEventListener(MouseEvent.CLICK, handleClick);
-			bttn_infect_PLUS.removeEventListener(MouseEvent.CLICK, handleClick);
+			   bttn_infect_PLUS.removeEventListener(MouseEvent.CLICK, handleClick);
 		  	MainApp.socket.removeEventListener(ProgressEvent.SOCKET_DATA, handleData);
-			trace("=============[Unloaded Lobby Events]==============");
+			trace("=============[Unloaded Game Events]==============");
 		}
 		public function clearScreen(){
 			trace(">Clearing Stage Children");
