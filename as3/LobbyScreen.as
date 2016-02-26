@@ -18,6 +18,7 @@ package as3 {
 		var myTransform = new SoundTransform(1, 0);
 		
 		public function LobbyScreen() {
+			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
 			bttn_START.addEventListener(MouseEvent.CLICK, handleClick);
 			MainApp.socket.addEventListener(ProgressEvent.SOCKET_DATA, handleData);
 			trace("=============[Loaded Lobby Events]==============");

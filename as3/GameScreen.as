@@ -32,6 +32,7 @@ package as3 {
 		var playerPos7:Object = {x:250,y:388};
 		
 		public function GameScreen() {
+      NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
 			bttn_hp_MINUS.addEventListener(MouseEvent.CLICK, handleClick("MHP"));
 			bttn_hp_PLUS.addEventListener(MouseEvent.CLICK, handleClick("PHP"));
 			bttn_infect_MINUS.addEventListener(MouseEvent.CLICK, handleClick("MI"));

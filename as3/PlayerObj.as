@@ -19,6 +19,7 @@ package as3 {
 			infect = playerInfect;
 
 			txt_otherplayers_INITIALS.text = initials;
+			txt_otherplayers_NAME.text = pname;
 			txt_otherplayers_HEALTH.text = life.toString();
 			txt_otherplayers_INFECT.text = infect.toString();
 		}

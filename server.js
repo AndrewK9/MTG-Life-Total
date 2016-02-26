@@ -6,7 +6,7 @@ var clientNumb = 0;
 var allowNewPlayers = true;
 var startingLife = 20;
 var numOfDeadClients = 0;
-var numOfDisconncetedClients = 0;
+var allowedToRestart = false;
 var readline = require('readline');
 
 var rl = readline.createInterface(process.stdin, process.stdout);
@@ -95,13 +95,16 @@ rl.on('close', function(){
 				//a player sent an update message
 				if(msg.indexOf("U:") == 0){
 					var playerUpdate = msg.substr(2);
-					adjustPlayerData(client.number, playerUpdate)
+					adjustPlayerData(client.number, playerUpdate);
 				}
 
 				//a player wanted a rematch
 				if(msg.indexOf("RE:") == 0){
 					console.log("==========[SETTING UP THE REMATCH]==========");
-					launchMatch();
+					if(allowedToRestart == true) {
+						allowedToRestart = false;
+						launchMatch();
+					}
 				}
 			}
 		});
@@ -249,6 +252,7 @@ function checkForWinner(){
 function gameOver(){
 	var msg = "";
 	msg += "GMOV:"+charSplit;
+	allowedToRestart = true;
 	for(var i = 0; i < clients.length; i++){
 		clients[i].write(msg);
 	}

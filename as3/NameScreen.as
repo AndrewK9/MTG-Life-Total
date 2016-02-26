@@ -23,10 +23,10 @@ package as3 {
 			trace("=============[Loaded Name Events]==============");
 		}
 		function handleKey(e:KeyboardEvent):void {
-			if(e.keyCode == 13) submit();
+			if(e.keyCode == 13 && input_NAME.length >= 2 && input_INITIALS.length >= 2) submit();
 		}
 		function handleClick(e:MouseEvent):void {
-			if(input_NAME.length >= 2 && input_INITIALS.length == 2) submit();
+			if(input_NAME.length >= 2 && input_INITIALS.length >= 2) submit();
 		}
 		function submit():void {
 			LPopNoise.play(0, 1, myTransform);

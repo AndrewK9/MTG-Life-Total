@@ -20,6 +20,7 @@ package as3 {
 		var myTransform = new SoundTransform(1, 0);
 		
 		public function WinScreen() {
+			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
 			bttn_rematch.addEventListener(MouseEvent.CLICK, handleClick);
 			addEventListener(Event.ENTER_FRAME, gameLoop);
       		MainApp.socket.addEventListener(ProgressEvent.SOCKET_DATA, handleData);
