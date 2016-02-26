@@ -6,11 +6,18 @@ package as3 {
 	import flash.net.URLRequest;//More URL stuff
 	import flash.desktop.NativeApplication;
 	import flash.desktop.SystemIdleMode;
+	import flash.media.*;//Needed for sound
 	
 	public class ConnectScreen extends MovieClip {
 
 		var buffer:String = "";
 		var charSplit:String = "\n";
+
+		//SFX Info
+		var LPopNoise:LPop = new LPop();
+		var HPopNoise:HPop = new HPop();
+		var myChannel2:SoundChannel = new SoundChannel();
+		var myTransform = new SoundTransform(1, 0);
 		
 		public function ConnectScreen() {
 			input_IP.addEventListener(KeyboardEvent.KEY_DOWN, handleKey);
@@ -51,6 +58,7 @@ package as3 {
 			connect();
 		}
 		function connect():void {
+			LPopNoise.play(0, 1, myTransform);
 			MainApp.socket.connect(input_IP.text, int(input_PORT.text));
 			trace(">Sent server info");
 		}		

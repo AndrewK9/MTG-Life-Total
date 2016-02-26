@@ -4,11 +4,18 @@ package as3 {
 	import flash.events.*;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.SystemIdleMode;
+	import flash.media.*;//Needed for sound
 	
 	public class LobbyScreen extends MovieClip {
 
 		var buffer:String = "";
 		var charSplit:String = "\n";
+
+		//SFX Info
+		var LPopNoise:LPop = new LPop();
+		var HPopNoise:HPop = new HPop();
+		var myChannel2:SoundChannel = new SoundChannel();
+		var myTransform = new SoundTransform(1, 0);
 		
 		public function LobbyScreen() {
 			bttn_START.addEventListener(MouseEvent.CLICK, handleClick);
@@ -52,6 +59,7 @@ package as3 {
 		}
 		function handleClick(e:MouseEvent):void {
 			startMatch();
+			LPopNoise.play(0, 1, myTransform);
 		}
 		function startMatch():void {
 			MainApp.socket.writeUTFBytes("START:" + charSplit);

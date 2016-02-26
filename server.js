@@ -6,6 +6,7 @@ var clientNumb = 0;
 var allowNewPlayers = true;
 var startingLife = 20;
 var numOfDeadClients = 0;
+var numOfDisconncetedClients = 0;
 var readline = require('readline');
 
 var rl = readline.createInterface(process.stdin, process.stdout);
@@ -138,12 +139,11 @@ function clientHasLeft(){
 		clients[i].write(msg);
 	}
 	console.log(">All client lobbies are clear");
-	for(var i = 0; i < clients.length; i++){
-		var message = "";
-		message += "NP:" + clients[i].initials + " - " + clients[i].name + charSplit;
-		clients[i].write(message);
+	for(var k = 0; k < clients.length; k++){
+		setTimeout(sendStartingData(clients[k].number, clients[k].initials, clients[k].name, clients[k].life, clients[k].infect), 1000);
 	}
 	console.log(">Lobbies have been repopulated");
+	numOfDisconncetedClients++;
 }
 
 function launchMatch(){
@@ -194,6 +194,7 @@ function adjustPlayerData(clientNum, updateType){
 			}
 			if(updateType == "MHP") {
 				clients[i].life--;
+				if(clients[i].life < 0) clients[i].life = 0;
 				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just LOST LIFE");
 			}
 			if(updateType == "PI") {
@@ -202,6 +203,7 @@ function adjustPlayerData(clientNum, updateType){
 			}
 			if(updateType == "MI") {
 				clients[i].infect--;
+				if(clients[i].infect < 0) clients[i].infect = 0;
 				console.log("UPDATE: "+clients[i].initials+" - "+clients[i].name+" just LOST AN INFECT POINT");
 			}
 			sendUpdate(clients[i].number, clients[i].initials, clients[i].name, clients[i].life, clients[i].infect);
@@ -227,6 +229,7 @@ function sendUpdate(clientToIgnore, clientInit, clientName, clientLife, clientIn
 
 function checkForDeaths(){
 	numOfDeadClients = 0;
+	//numOfDeadClients += numOfDisconncetedClients;
 	for(var i = 0; i < clients.length; i++){
 		if(clients[i].life <= 0 || clients[i].infect >= 10) numOfDeadClients++;
 	}

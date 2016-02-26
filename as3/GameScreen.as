@@ -4,6 +4,7 @@ package as3 {
 	import flash.events.*;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.SystemIdleMode;
+  import flash.media.*;//Needed for sound
 	
 	public class GameScreen extends MovieClip {
 
@@ -12,6 +13,12 @@ package as3 {
 		var players:Array = new Array();
 		var ourHealth:Number = 20;
 		var ourInfect:Number = 0;
+
+    //SFX Info
+    var LPopNoise:LPop = new LPop();
+    var HPopNoise:HPop = new HPop();
+    var myChannel2:SoundChannel = new SoundChannel();
+    var myTransform = new SoundTransform(1, 0);
 
 		//Player box positions
 		var newPlayerNumber = -1;
@@ -108,7 +115,11 @@ package as3 {
                    }
 
             	if(msg.indexOf("LP:") == 0){
-            		    //TO-DO:Kill off player who left
+                    for each(var p in players){
+                      removeChild(p);
+                    }
+            		    players.length = 0;
+                    newPlayerNumber = -1;
             	}
             	if(msg.indexOf("EXIT:") == 0){//Server crashed, stopped, or something...
             		clearScreen();
@@ -155,15 +166,19 @@ package as3 {
 					switch(type){
 						case "PHP":
 							msg = "U:PHP";
+              HPopNoise.play(0, 1, myTransform);
 							break;
 						case "MHP":
 							msg = "U:MHP";
+              LPopNoise.play(0, 1, myTransform);
 							break;
 						case "MI":
 							msg = "U:MI";
+              LPopNoise.play(0, 1, myTransform);
 							break;
 						case "PI":
 							msg = "U:PI";
+              HPopNoise.play(0, 1, myTransform);
 							break;
 					}
 	

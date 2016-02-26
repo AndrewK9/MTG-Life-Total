@@ -4,10 +4,17 @@ package as3 {
 	import flash.events.*;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.SystemIdleMode;
+	import flash.media.*;//Needed for sound
 	
 	public class NameScreen extends MovieClip {
 
 		var charSplit:String = "\n";
+
+		//SFX Info
+		var LPopNoise:LPop = new LPop();
+		var HPopNoise:HPop = new HPop();
+		var myChannel2:SoundChannel = new SoundChannel();
+		var myTransform = new SoundTransform(1, 0);
 		
 		public function NameScreen() {
 			input_NAME.addEventListener(KeyboardEvent.KEY_DOWN, handleKey);
@@ -22,6 +29,7 @@ package as3 {
 			if(input_NAME.length >= 2 && input_INITIALS.length == 2) submit();
 		}
 		function submit():void {
+			LPopNoise.play(0, 1, myTransform);
 			MainApp.socket.writeUTFBytes("NAME:" + input_NAME.text + charSplit + "INIT:" + input_INITIALS.text + charSplit);
 			MainApp.socket.flush();
 			trace(">Sent name and initials to the server");
