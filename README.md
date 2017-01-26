@@ -2,7 +2,7 @@
 <a href="#"><img src="http://i.imgur.com/URoJB0b.png"/></a>
 
 <a href="#install"><img src="https://img.shields.io/badge/platform-android-brightgreen.svg?style=flat-square"/></a>
-<a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/server%20platform-Node.js-brightgreen.svg?style=flat-square"/></a>
+<a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/server%20platform-nodejs-brightgreen.svg?style=flat-square"/></a>
 <a href="https://play.google.com/store/apps/details?id=air.MultiMTG&hl=en"><img src="https://img.shields.io/badge/installs-50-brightgreen.svg?style=flat-square"/></a>
 <a href="https://github.com/AndrewK9/Multiplayer-MTG/issues"><img src="https://img.shields.io/badge/issues-0%20open-brightgreen.svg?style=flat-square"/></a>
 <a href="https://github.com/AndrewK9/Multiplayer-MTG/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgray.svg?style=flat-square"/></a>
