@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.0.3] - 2017-02-06
+### Added
+- Recreated the splash screen.
+- Updated old splash screen code.
+- Created a Server Connection screen (GSMain), it's currently the acting main menu screen.
+
+### Changed
+- Added a tick event to the Game.as file.
+- Reworked the Game.as file to make the scenes it spawns slide from right to left instead of just "hard cuts" to the next scene.
+
+## [1.0.2] - 2017-02-06
+### Added
+- Base AS3 files based on Nick's Tic Tac Toe game.
+	- Connection.as
+	- Game.as
+	- LegitBuffer.as
+	- GameScene.as
+
 ## [1.0.1] - 2017-02-06
 ### Added
 - This CHANGELOG file.
