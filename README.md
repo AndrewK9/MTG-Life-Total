@@ -26,10 +26,10 @@ You can download the client for Android [here](https://play.google.com/store/app
 
 ## Usage
 ### Server
-To launch the server just run the server.js file with nodejs. Once its started choose your desired port and starting life total.
+To launch the server just run the server.js file with nodejs. You could also connect to the US based server if you can't host your own.
 
 ### Players
-Players just need to connect to the IPv4 address of the server along with the correct port number. Once everyone is in the lobby the game can begin. All players will manage their own life and infect totals using their devices.
+Players can join a match by typing in the custom room code.
 
 ## Team
 #### Creator
