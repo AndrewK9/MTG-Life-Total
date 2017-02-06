@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.0.4] - 2017-02-06
+### Changed
+- Reworked the logo to match the logo used on the Google Play page.
+
+### Removed
+- The white drop shadows from the text on the splash screen and main menu.
+- The logo from the main menu screen.
+
 ## [1.0.3] - 2017-02-06
 ### Added
 - Recreated the splash screen.
