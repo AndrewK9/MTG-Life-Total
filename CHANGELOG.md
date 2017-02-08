@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.0.6] - 2017-02-08
+### Added
+- Custom server IP and port input symbols.
+- The connect function now uses the US-East or custom IP and ports based on what the client chooses, the default is US-East.
+
 ## [1.0.5] - 2017-02-08
 ### Added
 - A server options popup menu for switching between the US based server and entering a custom IP address.

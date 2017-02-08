@@ -4,12 +4,17 @@ package as3 {
 	import flash.events.MouseEvent;
 	
 	public class GSMain extends GameScene {
+
+		private var usIP:String = "127.0.0.1";
+		private var usPort:String = "1234";
 		
 		public function GSMain() {
 			bttnConnect.addEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.addEventListener(MouseEvent.CLICK, handleWebsite);
 			bttnGear.addEventListener(MouseEvent.CLICK, handleGear);
 			serverOptions.visible = false;
+			ip.visible = false;
+			port.visible = false;
 			trace("=============[Loaded Main Menu Events]==============");
 		}
 		function handleWebsite(e:MouseEvent):void {
@@ -38,14 +43,23 @@ package as3 {
 			//TODO: Load US server info for connection
 			hideServerOptions();
 			trace(">User switched to the US based server");
+			ip.visible = false;
+			port.visible = false;
 		}
 		function handleSwitchCustom(e:MouseEvent):void{
 			//TODO: Load custom server input for connection
 			hideServerOptions();
 			trace(">User wanted to connect to a custom server");
+			ip.visible = true;
+			port.visible = true;
 		}
 		function handleConnectClick(e:MouseEvent):void {
 			//TODO: Check what server is selected and handle the connection
+			if(ip.visible){
+				connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
+			}else{
+				connect(usIP, int(usPort));
+			}
 		}
 
 		function connect(address:String, port:Number):void {
