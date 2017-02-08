@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.0.7] - 2017-02-08
+### Added
+- The server exist.
+- A Client and Server class to the server.js script.
+- Clients can now connect and disconnect from the server.
+
 ## [1.0.6] - 2017-02-08
 ### Added
 - Custom server IP and port input symbols.
