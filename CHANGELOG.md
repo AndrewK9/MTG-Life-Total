@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.0.5] - 2017-02-08
+### Added
+- A server options popup menu for switching between the US based server and entering a custom IP address.
+- Event listeners for the server options buttons.
+- Clients can now toggle the servers options menu on and off.
+
+### Changed
+- Updated the design for GSMain:
+	- New options icon.
+	- Moved the options icon to the left.
+	- Added a drop shadow to the title text.
+	- Changed the options icons drop shadow from 4px to 6px.
+
 ## [1.0.4] - 2017-02-06
 ### Changed
 - Reworked the logo to match the logo used on the Google Play page.

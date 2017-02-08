@@ -6,9 +6,10 @@ package as3 {
 	public class GSMain extends GameScene {
 		
 		public function GSMain() {
-			bttnConnect.addEventListener(MouseEvent.CLICK, handleClick);
+			bttnConnect.addEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.addEventListener(MouseEvent.CLICK, handleWebsite);
 			bttnGear.addEventListener(MouseEvent.CLICK, handleGear);
+			serverOptions.visible = false;
 			trace("=============[Loaded Main Menu Events]==============");
 		}
 		function handleWebsite(e:MouseEvent):void {
@@ -16,8 +17,34 @@ package as3 {
 		}
 		function handleGear(e:MouseEvent):void {
 			//TODO: Show server switch popup, let the client switch to a custom server
+			if(!serverOptions.visible){
+				serverOptions.visible = true;
+				trace(">Loaded server selection menu events");
+				serverOptions.bttnUS.addEventListener(MouseEvent.CLICK, handleSwitchUS);
+				serverOptions.bttnCustom.addEventListener(MouseEvent.CLICK, handleSwitchCustom);
+				return;
+			}else{
+				hideServerOptions();
+			}
 		}
-		function handleClick(e:MouseEvent):void {
+		function hideServerOptions():void{
+			serverOptions.visible = false;
+			trace(">Unloaded server selection menu events");
+			serverOptions.bttnUS.removeEventListener(MouseEvent.CLICK, handleSwitchUS);
+			serverOptions.bttnCustom.removeEventListener(MouseEvent.CLICK, handleSwitchCustom);
+			return;
+		}
+		function handleSwitchUS(e:MouseEvent):void{
+			//TODO: Load US server info for connection
+			hideServerOptions();
+			trace(">User switched to the US based server");
+		}
+		function handleSwitchCustom(e:MouseEvent):void{
+			//TODO: Load custom server input for connection
+			hideServerOptions();
+			trace(">User wanted to connect to a custom server");
+		}
+		function handleConnectClick(e:MouseEvent):void {
 			//TODO: Check what server is selected and handle the connection
 		}
 
@@ -25,7 +52,7 @@ package as3 {
 			Game.socket.connect(address, port);
 		}		
 		public override function dispose():void {
-			bttnConnect.removeEventListener(MouseEvent.CLICK, handleClick);
+			bttnConnect.removeEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.removeEventListener(MouseEvent.CLICK, handleWebsite);
 			bttnGear.removeEventListener(MouseEvent.CLICK, handleGear);
 			trace("=============[Unloaded Main Menu Events]==============");

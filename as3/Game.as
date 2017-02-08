@@ -63,9 +63,6 @@ package as3 {
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;
 			scene.x = 0;
-			if(main.scene){
-				main.scene.dispose();
-			}
 			newScene = scene;
 		}
 	}
