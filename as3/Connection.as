@@ -17,13 +17,13 @@
 			addEventListener(ProgressEvent.SOCKET_DATA, handleData);
 		}
 		private function handleConnect(e:Event):void {
-			//Game.showScene();
+			Game.showScene(new GSLogin());
 		}
 		private function handleError(e:IOErrorEvent):void {
 			
 		}
 		private function handleClose(e:Event):void {
-			//Game.showScene();
+			Game.showScene(new GSMain());
 		}
 		private function handleData(e:ProgressEvent):void {
 			readBytes(buffer.byteArray, buffer.length);
@@ -51,64 +51,28 @@
 		}
 		
 		//////////////////////// HANDLING PACKETS: ///////////////////////////////
-		private function readPacketJoin():void {
-			
-			if(buffer.length < 6) return; // not enough data in the stream; packet incomplete
-			var playerid:int = buffer.readUInt8(4);
-			var errcode:int = buffer.readUInt8(5);
-			
-			buffer.trim(6);
-			
-			if(playerid == 0){
-				switch(errcode){
-					case 1: trace("username too short"); break;
-					case 2: trace("username too long"); break;
-					case 3: trace("username uses invalid characters"); break;
-					case 4: trace("username is already taken"); break;
-					case 5: trace("The game session is full"); break;
-					default: trace("unknown error"); break;
-				}
-			} else {
-				// you are now in the game!
-				//GameState.playerid = playerid;
-				//Game.showScene();
-			}
-		}
-		private function readPacketUpdt():void {
-			if(buffer.length < 15) return; // not eough data in the stream; packet incomplete
-			//GameState.update(buffer); // this feels like cheating
-			
-			buffer.trim(15);
-		}
-		private function readPacketWait():void {
-			buffer.trim(4);
-			//if(GameState.playerid != 0) Game.showScene(new GSWait());
-		}
 		
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
-		// Use ONLY this method for sending.
-		// This will ensure that everything you send will use the LegitBuffer class
 		public function write(buffer:LegitBuffer):void {
 			writeBytes(buffer.byteArray);
 			flush();
+			trace(">Flushed buffer");
 		}
 		
-		public function sendJoinRequest(playMode:Boolean, username:String):void {
+		public function sendJoinRequest(matchCode:String, username:String):void {
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("JOIN");
-			buffer.writeUInt8(playMode ? 1 : 2, 4);
-			buffer.writeUInt8(username.length, 5);
-			buffer.write(username, 6);
-			
+			buffer.write(matchCode, 4);
+			buffer.writeUInt8(username.length, 10);
+			buffer.write(username, 11);
 			write(buffer);
 		}
-		public function sendMove(cell:int):void {
+		public function sendHostRequest(username:String):void {
 			var buffer:LegitBuffer = new LegitBuffer();
-			buffer.write("MOVE");
-			buffer.writeUInt8(cell, 4);
-			
+			buffer.write("HOST");
+			buffer.writeUInt8(username.length, 4);
+			buffer.write(username, 5);
 			write(buffer);
-		}
-		
+		}	
 	}
 }

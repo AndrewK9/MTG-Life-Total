@@ -11,7 +11,7 @@ package as3 {
 		public function GSMain() {
 			bttnConnect.addEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.addEventListener(MouseEvent.CLICK, handleWebsite);
-			bttnGear.addEventListener(MouseEvent.CLICK, handleGear);
+			bttnServerOptions.addEventListener(MouseEvent.CLICK, handleGear);
 			serverOptions.visible = false;
 			ip.visible = false;
 			port.visible = false;
@@ -68,7 +68,7 @@ package as3 {
 		public override function dispose():void {
 			bttnConnect.removeEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.removeEventListener(MouseEvent.CLICK, handleWebsite);
-			bttnGear.removeEventListener(MouseEvent.CLICK, handleGear);
+			bttnServerOptions.removeEventListener(MouseEvent.CLICK, handleGear);
 			trace("=============[Unloaded Main Menu Events]==============");
 		}
 	}

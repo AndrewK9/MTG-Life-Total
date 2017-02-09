@@ -6,6 +6,31 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.1] - 2017-02-09
+### Added
+- The server assigns players a ID number.
+- We created the following functions:
+	- destroyStreamData destroys the stream data.
+	- tryReadingPacket uses get next packet to try and figure out what type of packet we are handling.
+	- getNextpacket parses the packet for the packet type.
+	- splitBufferAt splits the buffer at a specific point.
+	- readPacketJoin parses the packet and gets a username and match code, we then check if the name is allowed and if the match exist.
+	- readPacketHost parses the packet adn gets a username and creates a match.
+	- isNameOkay checks to see if a name is legal, returns 1, 2, 3 as errors and 0 as approved.
+	- checkForMatch checks to see if the match code a player input is legit, if it is and there is space it adds the player to the match. Returns 1, 2 as errors and 0 as approved.
+- Added a Match class, it stores the match code, current players, max players, and the IDs of all current players.
+- Connection.as now has a sendHostRequest function, it now sends a HOST packet  along with the players username.
+- The GSLogin script:
+	- Players can select to join or host a match using the options menu via the gears button. Join is the default setting.
+	- We submit the packet based on the visibility of the matchCodeInput object.
+- There is now a GSLogin symbol in the project, it is displayed when the user connects.
+
+### Chagned
+- The sendJoinRequest in Connection.as now sends a match code instead of a player type.
+- In Connection.as the handleConnection function sends the client to the GSLogin screen.
+- Also in Connection.as the handleClose function returns the client to the GSMain screen. This should be updated so we can tell the player why they were forced back to the main menu.
+
+
 ## [1.0.7] - 2017-02-08
 ### Added
 - The server exist.
