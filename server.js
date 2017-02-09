@@ -42,7 +42,7 @@ class Server {
 	isNameOkay(username){
 		if(username.length < 2) return MTGP.NAME_SHORT;
 		if(username.length > 8) return MTGP.NAME_LONG;
-		if(!name.match(/^[a-zA-Z0-9\s\.\-\_]+$/)) return TTTP.NAME_INVALID;
+		if(!username.match(/^[a-zA-Z0-9\s\.\-\_]+$/)) return TTTP.NAME_INVALID;
 
 		return MTGP.GOOD;
 	}
@@ -60,6 +60,90 @@ class Server {
 		});
 
 		return MTGP.MATCH_INVALID;
+	}
+	createMatch(){
+		const matchCode = this.generateMatchCode()
+		this.matches.push(new Match(matchCode));
+		return matchCode;
+	}
+	generateMatchCode(){
+		const letter1 = this.getRandomInt(1,26);
+		const letter2 = this.getRandomInt(1,26);
+		const letter3 = this.getRandomInt(1,26);
+		const letter4 = this.getRandomInt(1,26);
+		const letter5 = this.getRandomInt(1,26);
+		const letter6 = this.getRandomInt(1,26);
+
+		var matchCode = "";
+		matchCode = this.getLetterFromInt(letter1)+
+		this.getLetterFromInt(letter2)+
+		this.getLetterFromInt(letter3)+
+		this.getLetterFromInt(letter4)+
+		this.getLetterFromInt(letter5)+
+		this.getLetterFromInt(letter6);
+
+		console.log("[SERVER] New host generated match code: " + matchCode);
+
+		return matchCode;
+	}
+	getRandomInt(min, max){
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	getLetterFromInt(number){
+		switch(number){
+        	case 1:
+        	    return "a";
+        	case 2:
+        	    return "b";
+        	case 3:
+        	    return "c";
+        	case 4:
+        	    return "d";
+        	case 5:
+        	    return "e";
+        	case 6:
+        	    return "f";
+        	case 7:
+        	    return "g";
+        	case 8:
+        	    return "h";
+        	case 9:
+        	    return "i";
+        	case 10:
+        	    return "j";
+        	case 11:
+        	    return "k";
+        	case 12:
+        	    return "l";
+        	case 13:
+        	    return "m";
+        	case 14:
+        	    return "n";
+        	case 15:
+        	    return "o";
+        	case 16:
+        	    return "p";
+        	case 17:
+        	    return "q";
+        	case 18:
+        	    return "r";
+        	case 19:
+        	    return "s";
+        	case 20:
+        	    return "t";
+        	case 21:
+        	    return "u";
+        	case 22:
+        	    return "v";
+        	case 23:
+        	    return "w";
+        	case 24:
+        	    return "x";
+        	case 25:
+        	    return "y";
+        	case 26:
+        	    return "z";
+    	}
 	}
 }
 
@@ -137,6 +221,9 @@ class Client {
 		else { this.sock.write(MTGP.buildNameError(errorCode)); }
 
 		//Check to see if the match exist
+		let matchResponce = this.server.checkForMatch(matchCode, this);
+		if(matchResponce === 0) { this.matchCode = matchCode; }
+		else { this.sock.write(MTGP.buildMatchError(matchResponce)); }
 	}
 	readPacketHost(){
 		if(this.buffer.length < 5) return;
@@ -152,17 +239,16 @@ class Client {
 		if(errorCode === 0) { this.username = username; }
 		else { this.sock.write(MTGP.buildNameError(errorCode)); }
 
-		//Check for match
-		let matchResponce = this.server.checkForMatch(matchCode, this);
-		if(matchResponce === 0) { this.matchCode = matchCode; }
-		else { this.sock.write(MTGP.buildMatchError(matchResponce)); }
+		//Create match
+		this.matchCode = this.server.createMatch();
+		let matchResponce = this.server.checkForMatch(this.matchCode, this);
 	}
 }
 
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.currentPlayers = 1;
+		this.currentPlayers = 0;
 		this.maxPlayers = 8;
 		this.players = [];
 	}
