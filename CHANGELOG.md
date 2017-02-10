@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
+
+## [1.1.4] - 2017-02-10
+### Added
+- The GSMain now tells the user when it's trying to connect to their desired server. If no connection is made within 60 seconds we warn the user that their server didn't respond.
+
 ## [1.1.3] - 2017-02-10
 ### Added
 - Added the font .ttf file to the main folder.
