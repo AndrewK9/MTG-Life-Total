@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.5] - 2017-02-10
+### Changed
+- Fixed the Connection Failed error message bug where it wasn't being reset when the player attempted another connection.
+
 ## [1.1.4] - 2017-02-10
 ### Added
 - The GSMain now tells the user when it's trying to connect to their desired server. If no connection is made within 60 seconds we warn the user that their server didn't respond.

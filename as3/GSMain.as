@@ -64,6 +64,7 @@ package as3 {
 		function handleConnectClick(e:MouseEvent):void {
 			//TODO: Check what server is selected and handle the connection
 			txtMessages.visible = true;
+			txtMessages.htmlText = "<FONT COLOR='#fffd66'>Attempting to connect to your desired server.</FONT>";
 			addEventListener(Event.ENTER_FRAME, connectionTimer);
 			if(ip.visible){
 				connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
