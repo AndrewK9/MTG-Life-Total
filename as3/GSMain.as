@@ -66,6 +66,7 @@ package as3 {
 			txtMessages.visible = true;
 			txtMessages.htmlText = "<FONT COLOR='#fffd66'>Attempting to connect to your desired server.</FONT>";
 			addEventListener(Event.ENTER_FRAME, connectionTimer);
+			trace(">Added Connection Timer Event Listener");
 			if(ip.visible){
 				connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
 			}else{
@@ -81,6 +82,7 @@ package as3 {
 			if (waitTime <= 0){
 				txtMessages.htmlText = "<FONT COLOR='#ff6666'>We were not able to connect to the server. Sorry.</FONT>";
 				removeEventListener(Event.ENTER_FRAME, connectionTimer);
+				trace(">Removed Connection Timer Event Listener");
 				waitTime = 60;
 			}
 		}

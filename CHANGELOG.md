@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.6] - 2017-02-10
+### Added
+- Designed the GSLobby screen.
+
 ## [1.1.5] - 2017-02-10
 ### Changed
 - Fixed the Connection Failed error message bug where it wasn't being reset when the player attempted another connection.
