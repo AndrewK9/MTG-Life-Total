@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
+## [1.1.3] - 2017-02-10
+### Added
+- Added the font .ttf file to the main folder.
+- Matches now hold all its spectators in an array.
+- Matche codes will be rejected if they have illegal characters.
+- Clients are removed from matches when they disconnect.
+
+### Changed
+- Switched the first 1.1.2 to 1.1.1.
+- Fixed protocol mismatch for the name invalid code.
+- We no longer track currentPlayers, instead we check to see what match.players.length is when checking to see if the match is full.
+- When we log the new match code to the console it is foced to uppercase.
 
 ## [1.1.2] - 2017-02-09
 ### Added
@@ -20,7 +32,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed some issues with the _this_ keyword with the match generation functions.
 - Switched name.match to username.match in the isNameOkay function.
 
-## [1.1.2] - 2017-02-09
+## [1.1.1] - 2017-02-09
 ### Added
 - The server assigns players a ID number.
 - We created the following functions:

@@ -36,24 +36,50 @@ class Server {
 		});
 	}
 	handleDisconnect(client){
-		console.log("[SERVER] A client disconnected (IP:" + client.sock.remoteAddress + ")");
+		console.log("[SERVER] "+client.username+" disconnected (IP:" + client.sock.remoteAddress + ")");
+		//Check to see if they were in a match
+		if(client.matchCode != ""){
+			//Remove them from the match
+			this.removeFromMatch(client);
+		}
 		this.clients.splice(this.clients.indexOf(client), 1);
+	}
+	removeFromMatch(client){
+		this.matches.map((match) => {
+			if(match.code.toUpperCase() == client.matchCode.toUpperCase()){
+				if(client.isPlayer){
+					match.players.splice(match.players.indexOf(client), 1);
+					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
+
+				}else{
+					match.spectators.splice(match.spectators.indexOf(client), 1);
+					console.log("["+match.code.toUpperCase()+"] " + client.username + " has stopped spectating the match");
+				}
+			}
+		});
 	}
 	isNameOkay(username){
 		if(username.length < 2) return MTGP.NAME_SHORT;
 		if(username.length > 8) return MTGP.NAME_LONG;
-		if(!username.match(/^[a-zA-Z0-9\s\.\-\_]+$/)) return TTTP.NAME_INVALID;
+		if(!username.match(/^[a-zA-Z0-9\s\.\-\_]+$/)) return MTGP.NAME_INVALID;
 
 		return MTGP.GOOD;
 	}
 	checkForMatch(matchCode, client){
+		if(!matchCode.match(/^[a-zA-Z]+$/)) return MTGP.MATCH_INVALID;
+
 		this.matches.map((match) => {
-			if(matchCode == match.code) {
-				if(match.currentPlayers < match.maxPlayers) {
-					match.currentPlayers++;
-					match.players.push(client.playerid);
+			if(matchCode.toUpperCase() == match.code.toUpperCase()) {
+				if(match.players.length < match.maxPlayers) {
+					match.players.push(client);
+					client.isPlayer = true;
+					console.log("["+match.code.toUpperCase()+"] " + client.username + " joined the match");
+					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
 					return MTGP.GOOD;
 				}else{
+					//The new player is a spectator
+					match.spectators.push(client);
+					console.log("["+match.code.toUpperCase()+"] " + client.username + " is spectating the match");
 					return MTGP.MATCH_FULL;
 				}
 			}
@@ -62,7 +88,7 @@ class Server {
 		return MTGP.MATCH_INVALID;
 	}
 	createMatch(){
-		const matchCode = this.generateMatchCode()
+		const matchCode = this.generateMatchCode();
 		this.matches.push(new Match(matchCode));
 		return matchCode;
 	}
@@ -82,7 +108,7 @@ class Server {
 		this.getLetterFromInt(letter5)+
 		this.getLetterFromInt(letter6);
 
-		console.log("[SERVER] New host generated match code: " + matchCode);
+		console.log("[SERVER] New host generated match code: " + matchCode.toUpperCase());
 
 		return matchCode;
 	}
@@ -156,6 +182,7 @@ class Client {
 		this.buffer = Buffer.alloc(0);
 		this.username = "";
 		this.matchCode = "";
+		this.isPlayer = false;
 
 		this.sock.on('error', (msg) => {});
 		this.sock.on('close', () => { this.server.handleDisconnect(this); });
@@ -248,9 +275,9 @@ class Client {
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.currentPlayers = 0;
 		this.maxPlayers = 8;
 		this.players = [];
+		this.spectators = [];
 	}
 }
 
