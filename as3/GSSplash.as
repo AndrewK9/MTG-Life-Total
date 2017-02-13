@@ -38,7 +38,7 @@ package as3{
 			trace(">URL Was Clicked");
 		}
 		public function showConnectScreen():void{
-			Game.showScene(new GSMain());
+			Game.showScene(new GSMain(0));
 			saidToSwitch = true;
 		}
 		public override function dispose():void {

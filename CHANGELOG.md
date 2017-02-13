@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.10] - 2017-02-13
+### Added
+- GSMain and GSLogin now have invisibile buttons that will force them to exit the option popup menus when they click outside the menu.
+- When attempting to connect we now try to connect every 10 seconds for a total of 50 seconds instead of just once.
+
 ## [1.1.9] - 2017-02-13
 ### Added
 - When the player presses the start button we send a Start Request Packet to the server.

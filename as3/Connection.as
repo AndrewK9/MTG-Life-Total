@@ -20,10 +20,10 @@
 			Game.showScene(new GSLogin());
 		}
 		private function handleError(e:IOErrorEvent):void {
-			
+			Game.showScene(new GSMain(1));
 		}
 		private function handleClose(e:Event):void {
-			Game.showScene(new GSMain());
+			Game.showScene(new GSMain(1));
 		}
 		private function handleData(e:ProgressEvent):void {
 			readBytes(buffer.byteArray, buffer.length);

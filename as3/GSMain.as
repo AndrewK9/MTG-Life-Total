@@ -10,17 +10,26 @@ package as3 {
 		private var usPort:String = "1234";
 
 		private var time:Number = 0;
-		private var waitTime:Number = 60;
-		
-		public function GSMain() {
+		private var waitTime:Number = 10;
+		private var timesWaited:Number = 0;
+
+		public function GSMain(reason:Number) {
 			bttnConnect.addEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.addEventListener(MouseEvent.CLICK, handleWebsite);
 			bttnServerOptions.addEventListener(MouseEvent.CLICK, handleGear);
 			serverOptions.visible = false;
 			ip.visible = false;
 			port.visible = false;
-			txtMessages.htmlText = "<FONT COLOR='#fffd66'>Attempting to connect to your desired server.</FONT>";
-			txtMessages.visible = false;
+			switch(reason){
+				case 0: //This is a normal switch
+					txtMessages.htmlText = "<FONT COLOR='#fffd66'>Attempting to connect to your desired server.</FONT>";
+					txtMessages.visible = false;
+					break;
+				case 1: //There was an unknown issue
+					txtMessages.htmlText = "<FONT COLOR='#ff6666'>An unknown error occurred. Sorry.</FONT>";
+					txtMessages.visible = true;
+					break;
+			}
 			trace("=============[Loaded Main Menu Events]==============");
 		}
 		function handleWebsite(e:MouseEvent):void {
@@ -33,6 +42,7 @@ package as3 {
 				trace(">Loaded server selection menu events");
 				serverOptions.bttnUS.addEventListener(MouseEvent.CLICK, handleSwitchUS);
 				serverOptions.bttnCustom.addEventListener(MouseEvent.CLICK, handleSwitchCustom);
+				serverOptions.bttnExitOptions.addEventListener(MouseEvent.CLICK, handleInvisibleButton);
 				return;
 			}else{
 				hideServerOptions();
@@ -43,7 +53,11 @@ package as3 {
 			trace(">Unloaded server selection menu events");
 			serverOptions.bttnUS.removeEventListener(MouseEvent.CLICK, handleSwitchUS);
 			serverOptions.bttnCustom.removeEventListener(MouseEvent.CLICK, handleSwitchCustom);
+			serverOptions.bttnExitOptions.removeEventListener(MouseEvent.CLICK, handleInvisibleButton);
 			return;
+		}
+		function handleInvisibleButton(e:MouseEvent):void{
+			hideServerOptions();
 		}
 		function handleSwitchUS(e:MouseEvent):void{
 			//TODO: Load US server info for connection
@@ -79,11 +93,21 @@ package as3 {
 			time = timeNew;//Keeps time updated
 			waitTime -= deltaTime;
 			trace("Time Till Error: " + waitTime);
-			if (waitTime <= 0){
+			if (timesWaited >= 4){
 				txtMessages.htmlText = "<FONT COLOR='#ff6666'>We were not able to connect to the server. Sorry.</FONT>";
 				removeEventListener(Event.ENTER_FRAME, connectionTimer);
 				trace(">Removed Connection Timer Event Listener");
-				waitTime = 60;
+				waitTime = 10;
+				timesWaited = 0;
+			}
+			else if(waitTime <= 0){
+				timesWaited++;
+				waitTime = 10;
+				if(ip.visible){
+					connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
+				}else{
+					connect(usIP, int(usPort));
+				}
 			}
 		}
 		function connect(address:String, port:Number):void {

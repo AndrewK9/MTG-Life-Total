@@ -21,6 +21,7 @@ package as3 {
 				joinOptionsMenu.visible = true;
 				joinOptionsMenu.bttnHostMatch.addEventListener(MouseEvent.CLICK, handleSwitchHost);
 				joinOptionsMenu.bttnJoinMatch.addEventListener(MouseEvent.CLICK, handleSwitchJoin);
+				joinOptionsMenu.bttnExitOptions.addEventListener(MouseEvent.CLICK, handleInvisibleButton);
 				trace(">Loaded Options Events");
 				return;
 			}
@@ -29,7 +30,11 @@ package as3 {
 			joinOptionsMenu.visible = false;
 			joinOptionsMenu.bttnHostMatch.removeEventListener(MouseEvent.CLICK, handleSwitchHost);
 			joinOptionsMenu.bttnJoinMatch.removeEventListener(MouseEvent.CLICK, handleSwitchJoin);
+			joinOptionsMenu.bttnExitOptions.removeEventListener(MouseEvent.CLICK, handleInvisibleButton);
 			trace(">Unloaded Options Events");
+		}
+		private function handleInvisibleButton(e:MouseEvent):void{
+			removeOptionsMenu();
 		}
 		private function handleSwitchHost(e:MouseEvent):void{
 			//TODO: Hide match code input, switch to host mode
