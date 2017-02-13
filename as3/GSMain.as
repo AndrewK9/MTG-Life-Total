@@ -93,6 +93,7 @@ package as3 {
 			bttnConnect.removeEventListener(MouseEvent.CLICK, handleConnectClick);
 			host.removeEventListener(MouseEvent.CLICK, handleWebsite);
 			bttnServerOptions.removeEventListener(MouseEvent.CLICK, handleGear);
+			removeEventListener(Event.ENTER_FRAME, connectionTimer);
 			trace("=============[Unloaded Main Menu Events]==============");
 		}
 	}

@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.7] - 2017-02-13
+### Added
+- Players now handle incoming packets from the server.
+- Players can switch to the GSLobby scene when the server says they can.
+- We now remove empty matches when all the players disconnect.
+- The following functions to the Connection class:
+	- readPacketNameError traces the error, doesn't yet display it.
+	- readPacketMatchError traces the error, doesn't yet display it.
+	- readPacjetJoinResponce sends the player to the GSLobby screen.
+	- readPacketHostResponce sends the player to the GSLobby screen.
+
+### Changed
+- The destroyStreamData function now trims the entire buffer, not sure if this will cause problems but when the .trim() was empty there were "end of file" errors.
+
 ## [1.1.6] - 2017-02-10
 ### Added
 - Designed the GSLobby screen.

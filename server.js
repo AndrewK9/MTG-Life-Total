@@ -6,15 +6,26 @@ const MTGP = {
 	MATCH_FULL: 1,
 	MATCH_INVALID: 2,
 	buildNameError: (err) =>{
-		const packet = Buffer.alloc(4);
-		packet.write("ERR");
-		packet.writeUInt8(err, 3);
+		const packet = Buffer.alloc(5);
+		packet.write("NERR");
+		packet.writeUInt8(err, 4);
 		return packet;
 	},
 	buildMatchError: (err) =>{
+		const packet = Buffer.alloc(5);
+		packet.write("MERR");
+		packet.writeUInt8(err, 4);
+		return packet;
+	},
+	buildJoinResponce: (responce) =>{
+		const packet = Buffer.alloc(5);
+		packet.write("MJRS");
+		packet.writeUInt8(responce, 4);
+		return packet;
+	},
+	buildHostResponce: () =>{
 		const packet = Buffer.alloc(4);
-		packet.write("ERR");
-		packet.writeUInt8(err, 3);
+		packet.write("MHRS");
 		return packet;
 	},
 };
@@ -50,6 +61,11 @@ class Server {
 				if(client.isPlayer){
 					match.players.splice(match.players.indexOf(client), 1);
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
+					if(match.players.length <= 0) {
+						console.log("["+match.code.toUpperCase()+"] Is empty and has been removed");
+						this.matches.splice(this.matches.indexOf(match), 1);
+						//console.log(this.matches.length);
+					}
 
 				}else{
 					match.spectators.splice(match.spectators.indexOf(client), 1);
@@ -66,8 +82,11 @@ class Server {
 		return MTGP.GOOD;
 	}
 	checkForMatch(matchCode, client){
+		//console.log(">"+matchCode+"<");
+		//console.log(this.matches.length);
+		let foundMatch = false;
+		let isPlayer = false;
 		if(!matchCode.match(/^[a-zA-Z]+$/)) return MTGP.MATCH_INVALID;
-
 		this.matches.map((match) => {
 			if(matchCode.toUpperCase() == match.code.toUpperCase()) {
 				if(match.players.length < match.maxPlayers) {
@@ -75,17 +94,20 @@ class Server {
 					client.isPlayer = true;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " joined the match");
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
-					return MTGP.GOOD;
+					foundMatch = true;
+					isPlayer = true;
 				}else{
 					//The new player is a spectator
 					match.spectators.push(client);
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " is spectating the match");
-					return MTGP.MATCH_FULL;
+					foundMatch = true;
 				}
 			}
 		});
 
-		return MTGP.MATCH_INVALID;
+		if(!foundMatch) { return MTGP.MATCH_INVALID; } //We couldn't find a match
+		else if(!isPlayer) { return MTGP.MATCH_FULL; } //The match was full so the client is a spectator
+		else { return MTGP.GOOD; } //We found the match and there was space for another player
 	}
 	createMatch(){
 		const matchCode = this.generateMatchCode();
@@ -245,12 +267,27 @@ class Client {
 		//Handle the username
 		let errorCode = this.server.isNameOkay(username);
 		if(errorCode === 0) { this.username = username; }
-		else { this.sock.write(MTGP.buildNameError(errorCode)); }
+		else { 
+			this.sock.write(MTGP.buildNameError(errorCode));
+			console.log("[ERROR] " + username + " is an invalid username");
+			return;
+		}
 
 		//Check to see if the match exist
 		let matchResponce = this.server.checkForMatch(matchCode, this);
-		if(matchResponce === 0) { this.matchCode = matchCode; }
-		else { this.sock.write(MTGP.buildMatchError(matchResponce)); }
+		//console.log(matchResponce);
+		if(matchResponce === 0 || matchResponce === 1) {
+			this.matchCode = matchCode;
+			//console.log(this.matchCode.toUpperCase());
+		}
+		if(matchResponce === 2) { 
+			this.sock.write(MTGP.buildMatchError(matchResponce));
+			console.log("[ERROR] " + matchCode.toUpperCase() + " is invalid");
+			return;
+		}
+
+		//If we make it this far it means the match code and username were good to go
+		this.sock.write(MTGP.buildJoinResponce(matchResponce));
 	}
 	readPacketHost(){
 		if(this.buffer.length < 5) return;
@@ -264,11 +301,17 @@ class Client {
 		//Handle the username
 		let errorCode = this.server.isNameOkay(username);
 		if(errorCode === 0) { this.username = username; }
-		else { this.sock.write(MTGP.buildNameError(errorCode)); }
-
+		else { 
+			this.sock.write(MTGP.buildNameError(errorCode));
+			console.log("[ERROR] " + username + " is invalid");
+			return;
+		}
+		//If we made it this far it means the username was legit
 		//Create match
 		this.matchCode = this.server.createMatch();
 		let matchResponce = this.server.checkForMatch(this.matchCode, this);
+		//Inform the player that they are good to go
+		this.sock.write(MTGP.buildHostResponce());
 	}
 }
 
