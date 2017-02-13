@@ -7,7 +7,7 @@ package as3 {
 		
 		public static var socket:Connection = new Connection();
 		private static var main:Game;
-		private var scene:GameScene;
+		public var scene;
 
 		static var hideScene:Boolean = false;
 		static var showNewScene:Boolean = false;
@@ -59,6 +59,10 @@ package as3 {
 			main.scene = newScene;
 			scene.x = 480;
 			showNewScene = true;
+		}
+		public static function updateLoginErrorMessage(newError:String):void{
+			main.scene.txtErrorMessage.visible = true;
+			main.scene.txtErrorMessage.text = newError;
 		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;

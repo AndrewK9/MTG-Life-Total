@@ -9,6 +9,7 @@ package as3 {
 			bttnJoinOptions.addEventListener(MouseEvent.CLICK, handleShowOptions);
 			bttnLoginContinue.addEventListener(MouseEvent.CLICK, handleLoginSubmit);
 			joinOptionsMenu.visible = false;
+			txtErrorMessage.visible = false;
 			trace("=============[Loaded Login Events]==============");
 		}
 		private function handleShowOptions(e:MouseEvent):void{

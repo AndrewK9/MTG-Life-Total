@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.8] - 2017-02-13
+### Added
+- Connection now handles errors by passing them to a static function in the Game class.
+- Game class has a new function _updaateLoginErrorMessage_ that displays the errors message on the login screen.
+
 ## [1.1.7] - 2017-02-13
 ### Added
 - Players now handle incoming packets from the server.

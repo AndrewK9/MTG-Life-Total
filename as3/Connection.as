@@ -72,15 +72,19 @@
 			switch(errCode){
 				case 1:
 					trace("Username was too short");
+					Game.updateLoginErrorMessage("Username is too short.");
 					break;
 				case 2:
 					trace("Username was too long");
+					Game.updateLoginErrorMessage("Username is too long.");
 					break;
 				case 3:
 					trace("Username was invalid");
+					Game.updateLoginErrorMessage("Username was invalid.");
 					break;
 				default:
 					trace("Unknown username error");
+					Game.updateLoginErrorMessage("An unknown error occurred.");
 					break;
 			}
 		}
@@ -93,9 +97,11 @@
 			switch(errCode){
 				case 2:
 					trace("Match code was invalid");
+					Game.updateLoginErrorMessage("Your match code was invalid.");
 					break;
 				default:
 					trace("Unknown match code error");
+					Game.updateLoginErrorMessage("An unknown error occurred.");
 					break;
 			}
 		}
