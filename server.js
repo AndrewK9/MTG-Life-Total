@@ -17,15 +17,30 @@ const MTGP = {
 		packet.writeUInt8(err, 4);
 		return packet;
 	},
-	buildJoinResponce: (responce) =>{
-		const packet = Buffer.alloc(5);
+	buildJoinResponce: (responce, matchCode, numOfPlayers) =>{
+		const packet = Buffer.alloc(12);
 		packet.write("MJRS");
 		packet.writeUInt8(responce, 4);
+		packet.writeUInt8(numOfPlayers, 5);
+		packet.write(matchCode, 6);
 		return packet;
 	},
-	buildHostResponce: () =>{
-		const packet = Buffer.alloc(4);
+	buildHostResponce: (matchCode) =>{
+		const packet = Buffer.alloc(10);
 		packet.write("MHRS");
+		packet.write(matchCode.toUpperCase(), 4);
+		return packet;
+	},
+	buildStartPacket: (isPlayer) =>{
+		const packet = Buffer.alloc(5);
+		packet.write("PSTG");
+		packet.writeUInt8(isPlayer ? 1 : 0, 4);
+		return packet;
+	},
+	buildLobbyUpdate: (numOfPlayers) =>{
+		const packet = Buffer.alloc(5);
+		packet.write("LUPD");
+		packet.writeUInt8(numOfPlayers, 4);
 		return packet;
 	},
 };
@@ -56,18 +71,22 @@ class Server {
 		this.clients.splice(this.clients.indexOf(client), 1);
 	}
 	removeFromMatch(client){
+		//We will loop though all the matches looking for one that matches the clients match code
 		this.matches.map((match) => {
 			if(match.code.toUpperCase() == client.matchCode.toUpperCase()){
 				if(client.isPlayer){
+					//The player is a client, we should update the lobby
 					match.players.splice(match.players.indexOf(client), 1);
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
+					this.broadcastNewGSLobbyPlayer(match.code, match.players.length);
 					if(match.players.length <= 0) {
+						//The match is now empty, let's remove it
 						console.log("["+match.code.toUpperCase()+"] Is empty and has been removed");
 						this.matches.splice(this.matches.indexOf(match), 1);
 						//console.log(this.matches.length);
 					}
-
 				}else{
+					//The client is a spectator, we will siently remove them
 					match.spectators.splice(match.spectators.indexOf(client), 1);
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " has stopped spectating the match");
 				}
@@ -89,13 +108,14 @@ class Server {
 		if(!matchCode.match(/^[a-zA-Z]+$/)) return MTGP.MATCH_INVALID;
 		this.matches.map((match) => {
 			if(matchCode.toUpperCase() == match.code.toUpperCase()) {
-				if(match.players.length < match.maxPlayers) {
+				if(match.players.length < match.maxPlayers && !match.hasStarted) {
 					match.players.push(client);
 					client.isPlayer = true;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " joined the match");
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
 					foundMatch = true;
 					isPlayer = true;
+					this.broadcastNewGSLobbyPlayer(matchCode, match.players.length);
 				}else{
 					//The new player is a spectator
 					match.spectators.push(client);
@@ -108,6 +128,14 @@ class Server {
 		if(!foundMatch) { return MTGP.MATCH_INVALID; } //We couldn't find a match
 		else if(!isPlayer) { return MTGP.MATCH_FULL; } //The match was full so the client is a spectator
 		else { return MTGP.GOOD; } //We found the match and there was space for another player
+	}
+	broadcastNewGSLobbyPlayer(code, numOfPlayers){
+		this.clients.map((client)=>{
+			if(client.matchCode.toUpperCase() == code.toUpperCase()){
+				//This client is in the match, tell them it started
+				client.sock.write(MTGP.buildLobbyUpdate(numOfPlayers));
+			}
+		});
 	}
 	createMatch(){
 		const matchCode = this.generateMatchCode();
@@ -193,6 +221,43 @@ class Server {
         	    return "z";
     	}
 	}
+	attemptMatchStart(code, client){
+		this.matches.map((match)=>{
+			if(code.toUpperCase() == match.code.toUpperCase()){
+				//We found the match, we need to check if there are enough players
+				if(match.players.length >= 2){
+					//The match can start
+					match.hasStarted = true;
+					console.log("["+match.code.toUpperCase()+"] " + client.username + " has started the match");
+					//TODO: Send clients a start packet
+					this.broadcastStartMatch(code);
+				}else{
+					//The match can't start
+					console.log("["+match.code.toUpperCase()+"] Not enough players to start a match");
+				}
+			}
+		});
+	}
+	broadcastStartMatch(code){
+		this.clients.map((client)=>{
+			if(client.matchCode.toUpperCase() == code.toUpperCase()){
+				//This client is in the match, tell them it started
+				client.sock.write(MTGP.buildStartPacket(client.isPlayer));
+			}
+		});
+	}
+	getLobbyNumber(code){
+		let numOfPlayers = 0;
+		this.matches.map((match)=>{
+			if(match.code.toUpperCase() == code.toUpperCase()){
+				//We found the match, return the number
+				numOfPlayers =  match.players.length;
+				return;
+			}
+		});
+
+		return numOfPlayers;
+	}
 }
 
 class Client {
@@ -235,6 +300,9 @@ class Client {
 				break;
 			case "HOST":
 				this.readPacketHost();
+				break;
+			case "UMSR":
+				this.readPacketStart();
 				break;
 			default:
 				return false;
@@ -287,7 +355,7 @@ class Client {
 		}
 
 		//If we make it this far it means the match code and username were good to go
-		this.sock.write(MTGP.buildJoinResponce(matchResponce));
+		this.sock.write(MTGP.buildJoinResponce(matchResponce, this.matchCode, this.server.getLobbyNumber(this.matchCode)));
 	}
 	readPacketHost(){
 		if(this.buffer.length < 5) return;
@@ -311,7 +379,11 @@ class Client {
 		this.matchCode = this.server.createMatch();
 		let matchResponce = this.server.checkForMatch(this.matchCode, this);
 		//Inform the player that they are good to go
-		this.sock.write(MTGP.buildHostResponce());
+		this.sock.write(MTGP.buildHostResponce(this.matchCode));
+	}
+	readPacketStart(){
+		//A player has pressed the start button, we need to try to start thier match
+		this.server.attemptMatchStart(this.matchCode, this);
 	}
 }
 
@@ -321,6 +393,7 @@ class Match{
 		this.maxPlayers = 8;
 		this.players = [];
 		this.spectators = [];
+		this.hasStarted = false;
 	}
 }
 

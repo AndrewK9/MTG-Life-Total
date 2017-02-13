@@ -61,8 +61,13 @@ package as3 {
 			showNewScene = true;
 		}
 		public static function updateLoginErrorMessage(newError:String):void{
-			main.scene.txtErrorMessage.visible = true;
-			main.scene.txtErrorMessage.text = newError;
+			if(main.scene == as3.GSLogin){
+				main.scene.txtErrorMessage.visible = true;
+				main.scene.txtErrorMessage.text = newError;
+			}
+		}
+		public static function updateLobbyStatus(numOfPlayers:Number):void{
+			if(main.scene == as3.GSLobby) main.scene.txtLobby.text = numOfPlayers.toString() + "/8 players in the lobby.";
 		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;

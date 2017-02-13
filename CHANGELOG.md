@@ -6,10 +6,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.9] - 2017-02-13
+### Added
+- When the player presses the start button we send a Start Request Packet to the server.
+- The server now handles Start Request Packets, if there are more than 2 players in the lobby we start the match.
+- The following are new functions on Server.js:
+	- attemptMatchStart will try to start the match if there are enough players.
+	- broadcastStartMatch will loop though all the clients and write a Start Packet.
+	- getLobbyNumber will retrun the number of players in the lobby.
+	- broadcastNewGSLobbyPlayer loops through all the clients and informs them what the current number of players are in their lobby.
+- Generated the first APK version for testing.
+
+### Changed
+- The broadcastJoinResponce now passes along the match code and current number of players in the lobby.
+- Server now has a new function _getLobbyNumber_ and it gets the current number of players in the lobby.
+- The update functions in the game class now check what scene is currently active in order to avoid getting null reference errors.
+
 ## [1.1.8] - 2017-02-13
 ### Added
 - Connection now handles errors by passing them to a static function in the Game class.
-- Game class has a new function _updaateLoginErrorMessage_ that displays the errors message on the login screen.
+- Game class has a new function _updateLoginErrorMessage_ that displays the errors message on the login screen.
 
 ## [1.1.7] - 2017-02-13
 ### Added

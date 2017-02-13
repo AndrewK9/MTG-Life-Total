@@ -48,6 +48,10 @@
 					break;
 				case "MHRS":
 					readPacketHostResponce();
+					break;
+				case "LUPD":
+					readPacketLobbyUpdate();
+					break;
 				default:
 					return false;
 					break;
@@ -107,19 +111,21 @@
 		}
 		private function readPacketJoinResponce():void{
 			//TODO: Send user to the lobby screen and check to see if they're a sepctator
-			if(buffer.length < 5) return;
+			if(buffer.length < 12) return;
 			var responceType = buffer.readUInt8(4);
-
-			buffer.trim(5);
+			var numOfPlayer = buffer.readUInt8(5);
+			buffer.trim(6);
+			var matchCode = buffer.toString();
+			buffer.trim(6);
 
 			switch(responceType){
 				case 0:
 					trace("We're a player in the match");
-					Game.showScene(new GSLobby());
+					Game.showScene(new GSLobby(matchCode, numOfPlayer, true));
 					break;
 				case 1:
 					trace("We're a sepctator");
-					Game.showScene(new GSLobby());
+					Game.showScene(new GSLobby(matchCode, numOfPlayer, false));
 					break;
 				default:
 					trace("Unknown responce type");
@@ -128,9 +134,18 @@
 		}
 		private function readPacketHostResponce():void{
 			//TODO: Send user to the lobby screen
-			if(buffer.length < 4) return;
+			if(buffer.length < 10) return;
 			buffer.trim(4);
-			Game.showScene(new GSLobby());
+			var matchCode = buffer.toString();
+			trace(matchCode);
+			buffer.trim(6);
+			Game.showScene(new GSLobby(matchCode, 1, true));
+		}
+		private function readPacketLobbyUpdate():void{
+			if(buffer.length < 5) return;
+			var numOfPlayer = buffer.readUInt8(4);
+			buffer.trim(5);
+			Game.updateLobbyStatus(numOfPlayer);
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
@@ -153,6 +168,11 @@
 			buffer.writeUInt8(username.length, 4);
 			buffer.write(username, 5);
 			write(buffer);
-		}	
+		}
+		public function sendStartRequest():void{
+			var buffer:LegitBuffer = new LegitBuffer();
+			buffer.write("UMSR");
+			write(buffer);
+		}
 	}
 }
