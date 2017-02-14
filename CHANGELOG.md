@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.11] - 2017-02-14
+### Added
+- Designed the player object and the GSMatch screen.
+- Created GSMatch script, it currently stores the player objects positions and adds/removes event listeners. It requires a boolean, based on what is passed in the player is a player or a spectator.
+- Created Player script, it will store the incoming players data. We will need to add an Update function that adjust its health/infect values.
+
 ## [1.1.10] - 2017-02-13
 ### Added
 - GSMain and GSLogin now have invisibile buttons that will force them to exit the option popup menus when they click outside the menu.

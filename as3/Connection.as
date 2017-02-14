@@ -52,6 +52,9 @@
 				case "LUPD":
 					readPacketLobbyUpdate();
 					break;
+				case "PSTG":
+					readPacketStart();
+					break;
 				default:
 					return false;
 					break;
@@ -146,6 +149,12 @@
 			var numOfPlayer = buffer.readUInt8(4);
 			buffer.trim(5);
 			Game.updateLobbyStatus(numOfPlayer);
+		}
+		private function readPacketStart():void{
+			if(buffer.length < 5) return;
+			var isPlayer = buffer.readUInt8(4) ? true : false;
+			buffer.trim(5);
+			Game.showScene(new GSMatch(isPlayer));
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
