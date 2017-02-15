@@ -24,7 +24,10 @@ package as3 {
 		var isDead = true;
 		var player = false;
 
+		var chatVisible = false;
+
 		var winnerObject;
+		var chatroomObject;
 
 		public function GSMatch(isPlayer:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
@@ -42,9 +45,23 @@ package as3 {
 				txtInfect.visible = false;
 				bgInfect.visible = false;
 				bgHealth.visible = false;
+				chatroomObject = new Chatroom();
+				addChild(chatroomObject);
+				chatroomObject.x = 0;
+				chatroomObject.y = 767;
+				chatroomObject.bttnShowChat.addEventListener(MouseEvent.CLICK, handleToggleChat);
 			}
 			player = isPlayer;
 			trace("=============[Loaded Match Events]==============");
+		}
+		private function handleToggleChat(e:MouseEvent):void{
+			if(!chatVisible){
+				chatroomObject.y = 0;
+				chatVisible = true;
+			}else{
+				chatroomObject.y = 767;
+				chatVisible = false;
+			}
 		}
 		private function handleInput(eventType:Number):Function{
 			return function(e:MouseEvent):void{
@@ -64,7 +81,8 @@ package as3 {
 			positionNewPlayer(newPlayer);
 			txtHealth.text = health;
 			txtInfect.text = infect;
-			infectKillAt = maxInfect; 
+			infectKillAt = maxInfect;
+			chatroomObject.parent.setChildIndex(chatroomObject, chatroomObject.parent.numChildren - 1);
 		}
 		public function update(playerID, newHealth, newInfect):void{
 			for(var k = 0; k < players.length; k++){
@@ -150,6 +168,7 @@ package as3 {
 			bttnPlusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
 			bttnMinusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
 			bttnPlusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+			chatroomObject.bttnShowChat.removeEventListener(MouseEvent.CLICK, handleToggleChat);
 			trace("=============[Unloaded Match Events]==============");
 		}
 	}

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.1] - 2017-02-15
+### Added
+- Designed the spectator chatroom.
+- The chat button will toggle the chatroom into position.
+
 ## [1.1.18] - 2017-02-15
 ### Added
 - broadcastRageQuit sends an update packet to everyone, the player symbol won't go away but it will say they are dead.
