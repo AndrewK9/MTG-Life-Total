@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.12] - 2017-02-14
+### Added
+- GSMatch's handleInput function now calls sendInput in the Connection script.
+- sendInput writes the input type to the buffer and sends it to the server.
+- The server now handles _UIUP_ (User Input Update) packets by passing them to the Match class' handlePlayerInput function.
+- Added the following properties to Clients:
+	- Health
+	- Infect
+	- Match
+	- isDead
+- We broadcast an Update packet when players send input.
+- The Match class now has a function that caluclates the starting values and assigns them to each player.
+- There is a releaseTheClients function in the Match class that sends buildStartUpdatePacket packets to all the player and spectators. When the client recieves this packet they will parse it and hand the info over to the GSMatch screen were it will spawn the Player object and assign its position and values.
+
+### Changed
+- Pushed buttons on GSMatch up due to issues on mobile devices.
+- Adjusted the invisible buttons position.
+- Set max Match players to 2, should return to 8 after testing.
+- Clients are now assigned a match when they join/spectate.
+- When calling the releaseTheClients function we first wait 3 seconds so the clients can switch to the match screen, this should be updated later so the clients send a _IRDY_ Im Ready packet to the server. Once everyone is ready we can release the clients.
+- In Game.as we now run a try/catch on startUpdate.
+- Also in Game.as we check to see if main.scene.txtLobby isn't null before we set its .text value. This was causing issues where players we not recieving updates becuase main.scene was [gameObject GSLobby] but as3.GSLobby was class GSLobby.
+- In the Servers checkForMaatch function we now only call the broadcastNewGSLobbyPlayer when players after the host are entering. For some reason the host was getting this packet before the Host Responce packet and it was causing the host to get suck on GSLobby.
+
 ## [1.1.11] - 2017-02-14
 ### Added
 - Designed the player object and the GSMatch screen.

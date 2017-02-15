@@ -67,7 +67,16 @@ package as3 {
 			}
 		}
 		public static function updateLobbyStatus(numOfPlayers:Number):void{
-			if(main.scene == as3.GSLobby) main.scene.txtLobby.text = numOfPlayers.toString() + "/8 players in the lobby.";
+			trace("I ran updateLobbyStatus but IDK if we are in the lobby or wat");
+			if(main.scene.txtLobby != null) main.scene.txtLobby.text = numOfPlayers.toString() + "/8 players in the lobby.";
+		}
+		public static function startUpdate(playerID, health, infect, username):void{
+			trace("I ran startUpdate in Game.as, but IDK if we are in the match yet...");
+			try{
+				main.scene.startUpdate(playerID, health, infect, username);
+			}catch(e:Error){
+				trace("Error: " + e);
+			}
 		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;

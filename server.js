@@ -43,6 +43,23 @@ const MTGP = {
 		packet.writeUInt8(numOfPlayers, 4);
 		return packet;
 	},
+	buildUpdate: (client)=>{
+		const packet = Buffer.alloc(7);
+		packet.write("UPDT");
+		packet.writeUInt8(client.id, 4);
+		packet.writeUInt8(client.health, 5);
+		packet.writeUInt8(client.infect, 6);
+		return packet;
+	},
+	buildStartUpdatePacket: (player) => {
+		const packet = Buffer.alloc(15);
+		packet.write("GSUD");
+		packet.writeUInt8(player.id, 4);
+		packet.writeUInt8(player.health, 5);
+		packet.writeUInt8(player.infect, 6);
+		packet.write(player.username, 7);
+		return packet;
+	},
 };
 
 class Server {
@@ -111,11 +128,13 @@ class Server {
 				if(match.players.length < match.maxPlayers && !match.hasStarted) {
 					match.players.push(client);
 					client.isPlayer = true;
+					client.match = match;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " joined the match");
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
 					foundMatch = true;
 					isPlayer = true;
-					this.broadcastNewGSLobbyPlayer(matchCode, match.players.length);
+					//console.log(match.players.length);
+					if(match.players.length > 1) this.broadcastNewGSLobbyPlayer(matchCode, match.players.length);
 				}else{
 					//The new player is a spectator
 					match.spectators.push(client);
@@ -230,19 +249,16 @@ class Server {
 					match.hasStarted = true;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " has started the match");
 					//TODO: Send clients a start packet
-					this.broadcastStartMatch(code);
+					match.broadcastStartMatch();
+					match.calculateMatch();
+					//We have to set a timeout because not all clients are loading into the match before we start sending them the other clients.
+					setTimeout(()=>{
+						match.releaseTheClients();
+					}, 3000);
 				}else{
 					//The match can't start
 					console.log("["+match.code.toUpperCase()+"] Not enough players to start a match");
 				}
-			}
-		});
-	}
-	broadcastStartMatch(code){
-		this.clients.map((client)=>{
-			if(client.matchCode.toUpperCase() == code.toUpperCase()){
-				//This client is in the match, tell them it started
-				client.sock.write(MTGP.buildStartPacket(client.isPlayer));
 			}
 		});
 	}
@@ -270,6 +286,10 @@ class Client {
 		this.username = "";
 		this.matchCode = "";
 		this.isPlayer = false;
+		this.match = null;
+		this.health = 0;
+		this.infect = 0;
+		this.isDead = true;
 
 		this.sock.on('error', (msg) => {});
 		this.sock.on('close', () => { this.server.handleDisconnect(this); });
@@ -303,6 +323,9 @@ class Client {
 				break;
 			case "UMSR":
 				this.readPacketStart();
+				break;
+			case "UIUP":
+				this.readPacketInput();
 				break;
 			default:
 				return false;
@@ -382,18 +405,121 @@ class Client {
 		this.sock.write(MTGP.buildHostResponce(this.matchCode));
 	}
 	readPacketStart(){
+		console.log("A player tried to start, let's see what happens.");
 		//A player has pressed the start button, we need to try to start thier match
 		this.server.attemptMatchStart(this.matchCode, this);
+	}
+	readPacketInput(){
+		if(this.buffer.length < 5) return;
+		const inputType = this.buffer.readUInt8(4);
+
+		//Now that we have the input type, we can pass it to the server
+		this.match.handlePlayerInput(inputType, this);
 	}
 }
 
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.maxPlayers = 8;
+		this.maxPlayers = 2;
 		this.players = [];
 		this.spectators = [];
 		this.hasStarted = false;
+		this.startingHealth = 0;
+		this.maxInfect = 0;
+	}
+	handlePlayerInput(inputType, client){
+		//TODO: Check for input type with a switch and handle it
+		this.players.map((player)=>{
+			if(player == client){
+				switch(inputType){
+					case 1:
+						this.minusHealth(client);
+						break;
+					case 2:
+						this.addHealth(client);
+						break;
+					case 3:
+						this.minusInfect(client);
+						break;
+					case 4:
+						this.addInfect(client);
+						break;
+					default:
+						console.log("["+this.match.code.toUpperCase()+"] Recieved an unknown input type");
+						break;
+				}
+			}
+		});
+	}
+	minusHealth(client){
+		client.health--;
+		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " lost health");
+		this.broadcastUpdate(client);
+	}
+	addHealth(client){
+		client.health++;
+		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " gained health");
+		this.broadcastUpdate(client);
+	}
+	minusInfect(client){
+		client.infect--;
+		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " lost infect");
+		this.broadcastUpdate(client);
+	}
+	addInfect(client){
+		client.health++;
+		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " gained infect");
+		this.broadcastUpdate(client);
+	}
+	broadcastUpdate(client){
+		this.players.map((player)=>{
+			if(player != client){
+				player.sock.write(MTGP.buildUpdate(client));
+			}
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildUpdate(client));
+		});
+	}
+	calculateMatch(){
+		console.log("Creating the starting lift and max infect");
+		this.startingHealth = this.players.length * 10;
+		this.maxInfect = this.startingHealth/2;
+
+		this.players.map((player)=>{
+			player.health = this.startingHealth;
+			player.infect = 0;
+			player.isDead = false;
+		});
+	}
+	releaseTheClients(){
+		console.log("Updating all players about each other");
+		this.players.map((player1)=>{
+			this.players.map((player2)=>{
+				if(player1 != player2){
+					player1.sock.write(MTGP.buildStartUpdatePacket(player2));
+				}
+			});
+		});
+
+		this.spectators.map((spec)=>{
+			this.players.map((player)=>{
+				spec.sock.write(MTGP.buildStartUpdatePacket(player));
+			});
+		});
+	}
+	broadcastStartMatch(){
+		console.log("Finding clients in the match and telling them to start");
+
+		this.players.map((player)=>{
+			player.sock.write(MTGP.buildStartPacket(player.isPlayer));
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildStartPacket(spec.isPlayer));
+		});
 	}
 }
 

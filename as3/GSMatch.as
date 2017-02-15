@@ -7,13 +7,19 @@ package as3 {
 	
 	public class GSMatch extends GameScene {
 
-		var playerPos0:Object = {x:18,y:52};
-		var playerPos1:Object = {x:250,y:52};
-		var playerPos2:Object = {x:18,y:164};
-		var playerPos3:Object = {x:250,y:164};
-		var playerPos4:Object = {x:18,y:276};
-		var playerPos5:Object = {x:250,y:276};
-		var playerPos6:Object = {x:18,y:388};
+		var playerPos1:Object = {x:18,y:52};
+		var playerPos2:Object = {x:250,y:52};
+		var playerPos3:Object = {x:18,y:164};
+		var playerPos4:Object = {x:250,y:164};
+		var playerPos5:Object = {x:18,y:276};
+		var playerPos6:Object = {x:250,y:276};
+		var playerPos7:Object = {x:18,y:388};
+
+		var players:Array = new Array();
+
+		var ourHealth = 0;
+		var ourInfect = 0;
+		var isDead = true;
 
 		public function GSMatch(isPlayer:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
@@ -34,17 +40,52 @@ package as3 {
 			}
 			trace("=============[Loaded Match Events]==============");
 		}
-		private function handleInput(eventType:Number){
-			//TODO: Check what type of input we are handling and tell the server
-			switch(eventType){
+		private function handleInput(eventType:Number):Function{
+			return function(e:MouseEvent):void{
+				//TODO: Check what type of input we are handling and tell the server
+				Game.socket.sendInput(eventType);
+			}
+		}
+		public function startUpdate(playerID, health, infect, username):void{
+			//TODO: This will run every time we get a new player from the servers players array
+			//We need to spawn a Player object and position it and store it in an array
+			var newPlayer:Player = new Player(playerID, username, health, infect);
+			addChild(newPlayer);
+			players.push(newPlayer);
+			trace(">Loaded new player" + username);
+			positionNewPlayer(newPlayer);
+		}
+		private function positionNewPlayer(newPlayer):void{
+			trace("Player had their position set");
+			switch(players.length){
 				case 1:
-					break;
+				    newPlayer.x = playerPos1.x;
+				    newPlayer.y = playerPos1.y;
+				    break;
 				case 2:
-					break;
+				    newPlayer.x = playerPos2.x;
+				    newPlayer.y = playerPos2.y;
+				    break;
 				case 3:
-					break;
+				    newPlayer.x = playerPos3.x;
+				    newPlayer.y = playerPos3.y;
+				    break;
 				case 4:
-					break;
+				    newPlayer.x = playerPos4.x;
+				    newPlayer.y = playerPos4.y;
+				    break;
+				case 5:
+				    newPlayer.x = playerPos5.x;
+				    newPlayer.y = playerPos5.y;
+				    break;
+				case 6:
+				    newPlayer.x = playerPos6.x;
+				    newPlayer.y = playerPos6.y;
+				    break;
+				case 7:
+				    newPlayer.x = playerPos7.x;
+				    newPlayer.y = playerPos7.y;
+				    break;
 			}
 		}
 		public override function dispose():void {
@@ -55,5 +96,4 @@ package as3 {
 			trace("=============[Unloaded Match Events]==============");
 		}
 	}
-	
 }

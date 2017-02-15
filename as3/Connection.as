@@ -55,6 +55,9 @@
 				case "PSTG":
 					readPacketStart();
 					break;
+				case "GSUD":
+					readPacketStartUpdate();
+					break;
 				default:
 					return false;
 					break;
@@ -66,7 +69,9 @@
 		}
 		private function getNextPacketType():String {
 			if(buffer.length < 4) return "";
-			return buffer.slice(0, 4).toString();
+			var bufferType = buffer.slice(0, 4).toString();
+			trace(">"+bufferType+"<");
+			return bufferType;
 		}
 		
 		//////////////////////// HANDLING PACKETS: ///////////////////////////////
@@ -136,6 +141,7 @@
 			}
 		}
 		private function readPacketHostResponce():void{
+			trace("I recieved a host responce packet");
 			//TODO: Send user to the lobby screen
 			if(buffer.length < 10) return;
 			buffer.trim(4);
@@ -145,16 +151,31 @@
 			Game.showScene(new GSLobby(matchCode, 1, true));
 		}
 		private function readPacketLobbyUpdate():void{
+			trace("I recieved a lobby update packet");
 			if(buffer.length < 5) return;
 			var numOfPlayer = buffer.readUInt8(4);
 			buffer.trim(5);
+			trace(numOfPlayer);
 			Game.updateLobbyStatus(numOfPlayer);
 		}
 		private function readPacketStart():void{
+			trace("I recieved a start packet");
 			if(buffer.length < 5) return;
 			var isPlayer = buffer.readUInt8(4) ? true : false;
 			buffer.trim(5);
 			Game.showScene(new GSMatch(isPlayer));
+		}
+		private function readPacketStartUpdate():void{
+			trace("I shold be reading start update packets");
+			if(buffer.length < 8) return;
+			var playerID = buffer.readUInt8(4);
+			var health = buffer.readUInt8(5);
+			var infect = buffer.readUInt8(6);
+			buffer.trim(7);
+			var username = buffer.toString();
+			buffer.trim(8);
+			trace(">"+playerID + "<>" + health+"<>"+infect+"<>"+username+"<");
+			Game.startUpdate(playerID, health, infect, username);
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
@@ -181,6 +202,12 @@
 		public function sendStartRequest():void{
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("UMSR");
+			write(buffer);
+		}
+		public function sendInput(eventType:Number):void{
+			var buffer:LegitBuffer = new LegitBuffer();
+			buffer.write("UIUP");
+			buffer.writeUInt8(eventType, 4);
 			write(buffer);
 		}
 	}
