@@ -43,6 +43,37 @@ const MTGP = {
 		packet.writeUInt8(numOfPlayers, 4);
 		return packet;
 	},
+	buildUpdate: (client)=>{
+		const packet = Buffer.alloc(7);
+		packet.write("UPDT");
+		packet.writeUInt8(client.playerid, 4);
+		packet.writeUInt8(client.health, 5);
+		packet.writeUInt8(client.infect, 6);
+		return packet;
+	},
+	buildPrivateUpdate: (client)=>{
+		const packet = Buffer.alloc(6);
+		packet.write("PUDT");
+		packet.writeUInt8(client.health, 4);
+		packet.writeUInt8(client.infect, 5);
+		return packet;
+	},
+	buildStartUpdatePacket: (player, match) => {
+		const packet = Buffer.alloc(16);
+		packet.write("GSUD");
+		packet.writeUInt8(player.playerid, 4);
+		packet.writeUInt8(player.health, 5);
+		packet.writeUInt8(player.infect, 6);
+		packet.writeUInt8(match.maxInfect, 7)
+		packet.write(player.username, 8);
+		return packet;
+	},
+	buildGameOver: (winner)=>{
+		const packet = Buffer.alloc(12);
+		packet.write("GMOV");
+		packet.write(winner, 4);
+		return packet;
+	},
 };
 
 class Server {
@@ -57,7 +88,7 @@ class Server {
 			this.id++;
 		});
 		this.sock.listen(this.port, () => {
-			console.log("++[STARTRING SERVER]++")
+			console.log("++[STARTRING SERVER]++");
 			console.log("[SERVER] The server is running on port " + this.port);
 		});
 	}
@@ -78,7 +109,8 @@ class Server {
 					//The player is a client, we should update the lobby
 					match.players.splice(match.players.indexOf(client), 1);
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
-					this.broadcastNewGSLobbyPlayer(match.code, match.players.length);
+					if(!match.hasStarted) this.broadcastNewGSLobbyPlayer(match.code, match.players.length);
+					else match.broadcastRageQuit(client);
 					if(match.players.length <= 0) {
 						//The match is now empty, let's remove it
 						console.log("["+match.code.toUpperCase()+"] Is empty and has been removed");
@@ -111,11 +143,13 @@ class Server {
 				if(match.players.length < match.maxPlayers && !match.hasStarted) {
 					match.players.push(client);
 					client.isPlayer = true;
+					client.match = match;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " joined the match");
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
 					foundMatch = true;
 					isPlayer = true;
-					this.broadcastNewGSLobbyPlayer(matchCode, match.players.length);
+					//console.log(match.players.length);
+					if(match.players.length > 1) this.broadcastNewGSLobbyPlayer(matchCode, match.players.length);
 				}else{
 					//The new player is a spectator
 					match.spectators.push(client);
@@ -230,19 +264,16 @@ class Server {
 					match.hasStarted = true;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " has started the match");
 					//TODO: Send clients a start packet
-					this.broadcastStartMatch(code);
+					match.broadcastStartMatch();
+					match.calculateMatch();
+					//We have to set a timeout because not all clients are loading into the match before we start sending them the other clients.
+					setTimeout(()=>{
+						match.releaseTheClients();
+					}, 3000);
 				}else{
 					//The match can't start
 					console.log("["+match.code.toUpperCase()+"] Not enough players to start a match");
 				}
-			}
-		});
-	}
-	broadcastStartMatch(code){
-		this.clients.map((client)=>{
-			if(client.matchCode.toUpperCase() == code.toUpperCase()){
-				//This client is in the match, tell them it started
-				client.sock.write(MTGP.buildStartPacket(client.isPlayer));
 			}
 		});
 	}
@@ -270,6 +301,10 @@ class Client {
 		this.username = "";
 		this.matchCode = "";
 		this.isPlayer = false;
+		this.match = null;
+		this.health = 0;
+		this.infect = 0;
+		this.isDead = true;
 
 		this.sock.on('error', (msg) => {});
 		this.sock.on('close', () => { this.server.handleDisconnect(this); });
@@ -303,6 +338,12 @@ class Client {
 				break;
 			case "UMSR":
 				this.readPacketStart();
+				break;
+			case "UIUP":
+				this.readPacketInput();
+				break;
+			case "REST":
+				this.readPacketRestart();
 				break;
 			default:
 				return false;
@@ -382,18 +423,194 @@ class Client {
 		this.sock.write(MTGP.buildHostResponce(this.matchCode));
 	}
 	readPacketStart(){
+		this.splitBufferAt(4);
+		//console.log("A player tried to start, let's see what happens.");
 		//A player has pressed the start button, we need to try to start thier match
 		this.server.attemptMatchStart(this.matchCode, this);
+		
+	}
+	readPacketInput(){
+		//console.log(this.buffer.length);
+		if(this.buffer.length < 5) return;
+		const inputType = this.buffer.readUInt8(4);
+		this.splitBufferAt(5);
+		//console.log("I am reading packet input: " + inputType);
+		//Now that we have the input type, we can pass it to the server
+		this.match.handlePlayerInput(inputType, this);
+	}
+	readPacketRestart(){
+		if(this.buffer.length < 4) return;
+		this.splitBufferAt(4);
+		this.match.handleRestart();
 	}
 }
 
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.maxPlayers = 8;
+		this.maxPlayers = 2;
 		this.players = [];
 		this.spectators = [];
 		this.hasStarted = false;
+		this.startingHealth = 0;
+		this.maxInfect = 0;
+	}
+	handlePlayerInput(inputType, client){
+		//TODO: Check for input type with a switch and handle it
+		switch(inputType){
+			case 1:
+				this.minusHealth(client);
+				break;
+			case 2:
+				this.addHealth(client);
+				break;
+			case 3:
+				this.minusInfect(client);
+				break;
+			case 4:
+				this.addInfect(client);
+				break;
+			default:
+				console.log("["+this.code.toUpperCase()+"] Recieved an unknown input type");
+				break;
+		}
+	}
+	minusHealth(client){
+		client.health--;
+		if(client.health < 0) client.health = 0;
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost health " + client.health);
+		this.broadcastUpdate(client);
+		this.checkForDeath(client);
+	}
+	addHealth(client){
+		client.health++;
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained health " + client.health);
+		this.broadcastUpdate(client);
+		this.checkForDeath(client);
+	}
+	minusInfect(client){
+		client.infect--;
+		if(client.infect < 0) client.infect = 0;
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost infect " + client.infect);
+		this.broadcastUpdate(client);
+		this.checkForDeath(client);
+	}
+	addInfect(client){
+		client.infect++;
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained infect " + client.infect);
+		this.broadcastUpdate(client);
+		this.checkForDeath(client);
+	}
+	checkForDeath(client){
+		if(client.health <= 0 || client.infect >= this.maxInfect) {
+			client.isDead = true;
+			this.checkForWin();
+			console.log("["+this.code.toUpperCase()+"] " + client.username + " died");
+		}
+		else client.isDead = false;
+
+		
+	}
+	checkForWin(){
+		let numOfDead = 0;
+		this.players.map((player)=>{
+			if(player.isDead) numOfDead++;
+		});
+
+		if(numOfDead >= this.players.length - 1){
+			//All or all but one players are dead
+			let winner = "No one";
+			this.players.map((player)=>{
+				if(!player.isDead) {
+					winner = player.username;
+					console.log("["+this.code.toUpperCase()+"] " + player.username + " won the game");
+				}
+			});
+
+			this.broadcastGameOver(winner);
+		}
+	}
+	broadcastGameOver(winner){
+		this.players.map((player)=>{
+			player.sock.write(MTGP.buildGameOver(winner));
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildGameOver(winner));
+		});
+	}
+	broadcastUpdate(client){
+		client.sock.write(MTGP.buildPrivateUpdate(client));
+
+		this.players.map((player)=>{
+			if(player != client){
+				player.sock.write(MTGP.buildUpdate(client));
+			}
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildUpdate(client));
+		});
+	}
+	calculateMatch(){
+		this.startingHealth = this.players.length * 10;
+		this.maxInfect = this.startingHealth/2;
+		console.log("["+this.code.toUpperCase()+"] Generated a starting health of: " + this.startingHealth + " and max infect of: " + this.maxInfect);
+		this.players.map((player)=>{
+			player.health = this.startingHealth;
+			player.infect = 0;
+			player.isDead = false;
+		});
+	}
+	releaseTheClients(){
+		//console.log("Updating all players about each other");
+		this.players.map((player1)=>{
+			this.players.map((player2)=>{
+				if(player1 != player2){
+					player1.sock.write(MTGP.buildStartUpdatePacket(player2, this));
+				}
+			});
+		});
+
+		this.spectators.map((spec)=>{
+			this.players.map((player)=>{
+				spec.sock.write(MTGP.buildStartUpdatePacket(player, this));
+			});
+		});
+	}
+	broadcastStartMatch(){
+		//console.log("Finding clients in the match and telling them to start");
+
+		this.players.map((player)=>{
+			player.sock.write(MTGP.buildStartPacket(player.isPlayer));
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildStartPacket(spec.isPlayer));
+		});
+	}
+	broadcastRageQuit(client){
+		client.isDead = true;
+		client.health = 0;
+
+		this.players.map((player)=>{
+			if(player != client){
+				player.sock.write(MTGP.buildUpdate(client));
+			}
+		});
+
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildUpdate(client));
+		});
+	}
+	handleRestart(){
+		console.log("["+this.code.toUpperCase()+"] Someone restarted the match");
+		this.broadcastStartMatch();
+		this.calculateMatch();
+		//We have to set a timeout because not all clients are loading into the match before we start sending them the other clients.
+		setTimeout(()=>{
+			this.releaseTheClients();
+		}, 3000);
 	}
 }
 
