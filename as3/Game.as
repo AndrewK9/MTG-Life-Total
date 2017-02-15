@@ -61,7 +61,7 @@ package as3 {
 			showNewScene = true;
 		}
 		public static function updateLoginErrorMessage(newError:String):void{
-			if(main.scene == as3.GSLogin){
+			if(main.scene.txtErrorMessage != null){
 				main.scene.txtErrorMessage.visible = true;
 				main.scene.txtErrorMessage.text = newError;
 			}

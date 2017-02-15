@@ -201,11 +201,13 @@
 			write(buffer);
 		}
 		public function sendStartRequest():void{
+			//trace("I sent a start request");
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("UMSR");
 			write(buffer);
 		}
 		public function sendInput(eventType:Number):void{
+			trace("I sent a input to the server: " + eventType);
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("UIUP");
 			buffer.writeUInt8(eventType, 4);

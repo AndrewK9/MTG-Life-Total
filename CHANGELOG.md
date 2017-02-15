@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.15] - 2017-02-14
 ### Changed
+- Forgot to use this.splitBufferAt to remove the packets from the buffer after we handle them for the start message, it was getting called over and over again when a new packet was being sent.
+- Uncommented the update message to the players and spectators, the client doesn't handle these messages yet.
+- Fixed an issue on Game.as where error messages were not appearing on GSLogin. Same reason as before, used same fix.
+
+## [1.1.15] - 2017-02-14
+### Changed
 - Fixed removeFromMatch function, it now checks to see if the match is running. Before it was trying to update the GSLobby screen but if a player left during the match it would crash the app. Now we have a broadcastRageQuit function in the Match class that kills the player. They still get removed from the players array and the clients array. I will have to figure out how to deal with this, maybe send an update to the players to kill the player and ignore them?
 
 ## [1.1.14] - 2017-02-14

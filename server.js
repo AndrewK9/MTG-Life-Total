@@ -410,13 +410,16 @@ class Client {
 		//console.log("A player tried to start, let's see what happens.");
 		//A player has pressed the start button, we need to try to start thier match
 		this.server.attemptMatchStart(this.matchCode, this);
+		this.splitBufferAt(4);
 	}
 	readPacketInput(){
+		//console.log(this.buffer.length);
 		if(this.buffer.length < 5) return;
 		const inputType = this.buffer.readUInt8(4);
-
+		//console.log("I am reading packet input: " + inputType);
 		//Now that we have the input type, we can pass it to the server
 		this.match.handlePlayerInput(inputType, this);
+		this.splitBufferAt(5);
 	}
 }
 
@@ -432,46 +435,42 @@ class Match{
 	}
 	handlePlayerInput(inputType, client){
 		//TODO: Check for input type with a switch and handle it
-		this.players.map((player)=>{
-			if(player == client){
-				switch(inputType){
-					case 1:
-						this.minusHealth(client);
-						break;
-					case 2:
-						this.addHealth(client);
-						break;
-					case 3:
-						this.minusInfect(client);
-						break;
-					case 4:
-						this.addInfect(client);
-						break;
-					default:
-						console.log("["+this.match.code.toUpperCase()+"] Recieved an unknown input type");
-						break;
-				}
-			}
-		});
+		switch(inputType){
+			case 1:
+				this.minusHealth(client);
+				break;
+			case 2:
+				this.addHealth(client);
+				break;
+			case 3:
+				this.minusInfect(client);
+				break;
+			case 4:
+				this.addInfect(client);
+				break;
+			default:
+				console.log("["+this.code.toUpperCase()+"] Recieved an unknown input type");
+				break;
+		}
 	}
 	minusHealth(client){
 		client.health--;
-		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " lost health");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost health");
 		this.broadcastUpdate(client);
 	}
 	addHealth(client){
 		client.health++;
-		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " gained health");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained health");
 		this.broadcastUpdate(client);
 	}
 	minusInfect(client){
 		client.infect--;
-		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " lost infect");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost infect");
 		this.broadcastUpdate(client);
 	}
 	addInfect(client){
 		client.health++;
-		console.log("["+this.match.code.toUpperCase()+"] " + client.username + " gained infect");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained infect");
 		this.broadcastUpdate(client);
 	}
 	broadcastUpdate(client){
