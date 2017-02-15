@@ -92,6 +92,13 @@ package as3 {
 				trace("Error: " + e);
 			}
 		}
+		public static function gameOver(winner):void{
+			try{
+				main.scene.gameOver(winner);
+			}catch(e:Error){
+				trace("Error: " + e);
+			}
+		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;
 			scene.x = 0;

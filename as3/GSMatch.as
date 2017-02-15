@@ -4,6 +4,7 @@ package as3 {
 	import flash.events.*;
 	import flash.desktop.NativeApplication;
 	import flash.desktop.SystemIdleMode;
+	import flash.system.System;
 	
 	public class GSMatch extends GameScene {
 
@@ -21,6 +22,9 @@ package as3 {
 		var ourInfect = 0;
 		var infectKillAt = 0;
 		var isDead = true;
+		var player = false;
+
+		var winnerObject;
 
 		public function GSMatch(isPlayer:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
@@ -39,6 +43,7 @@ package as3 {
 				bgInfect.visible = false;
 				bgHealth.visible = false;
 			}
+			player = isPlayer;
 			trace("=============[Loaded Match Events]==============");
 		}
 		private function handleInput(eventType:Number):Function{
@@ -80,6 +85,32 @@ package as3 {
 
 			txtHealth.text = ourHealth.toString();
 			txtInfect.text = ourInfect.toString();
+		}
+		public function gameOver(winner):void{
+			for(var i = numChildren - 1; i >= 0; i--){
+				var child = getChildAt(i);
+				if(child.hasOwnProperty("dispose")) child.dispose();
+				removeChildAt(i);
+			}
+			winnerObject = new Winner();
+			addChild(winnerObject);
+			winnerObject.y = 320;
+			winnerObject.txtWinner.text = winner;
+			if(player){
+				winnerObject.bttnRestart.addEventListener(MouseEvent.CLICK, handleRestart);
+				winnerObject.bttnQuit.addEventListener(MouseEvent.CLICK, handleQuit);
+			}else{
+				winnerObject.bttnRestart.visible = false;
+				winnerObject.bttnQuit.visible = false;
+			}
+		}
+		private function handleRestart(e:MouseEvent):void{
+			winnerObject.bttnRestart.removeEventListener(MouseEvent.CLICK, handleRestart);
+			winnerObject.bttnQuit.removeEventListener(MouseEvent.CLICK, handleQuit);
+			Game.socket.sendRestart();
+		}
+		private function handleQuit(e:MouseEvent):void{
+			NativeApplication.nativeApplication.exit();
 		}
 		private function positionNewPlayer(newPlayer):void{
 			//trace("Player had their position set");

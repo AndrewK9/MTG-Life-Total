@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.18] - 2017-02-15
+### Added
+- broadcastRageQuit sends an update packet to everyone, the player symbol won't go away but it will say they are dead.
+- After handling input the Match class checks for death. If someone dies we run the checkForWin function.
+- checkForWin loops through all the players and counts the deaths, if 0 to 1 player is alive we declare a winner.
+- The broadcastGameOver function loops through everyone connected to the match and sends a _GMOV_ packet.
+- The Game Over packet contains the name of the winner.
+- Connection.as handels _GMOV_ packets by sending the winner to Game.as and then to GSMatch.
+- GSMatch clears the screen with the gameOver function.
+- We spawn a Winner symbol and pass the winners name into it.
+- Winner has two buttons, players can quit the app or restart the match.
+- gameOver hides the buttons if they're a spectator.
+
 ## [1.1.17] - 2017-02-15
 ### Chagned
 - The readPacketUpdate, readPacketPrivateUpdate, and readPacketStartUpdate all call the tryReadingPacket function when they are done. Mobile devices had lag and a major buffer backlog and becuase the tryReadingPacket function doesn't endlessly loop the player would get behind on updates.

@@ -66,6 +66,9 @@
 				case "PUDT":
 					readPacketPrivateUpdate();
 					break;
+				case "GMOV":
+					readPacketGameOver();
+					break;
 				default:
 					trace("I don't have this packet");
 					return false;
@@ -206,6 +209,13 @@
 			Game.privateUpdate(health, infect);
 			tryReadingPacket();
 		}
+		private function readPacketGameOver():void{
+			if(buffer.length < 5) return;
+			buffer.trim(4);
+			var username = buffer.toString();
+			buffer.trim(8);
+			Game.gameOver(username);
+		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
 			writeBytes(buffer.byteArray);
@@ -239,6 +249,11 @@
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("UIUP");
 			buffer.writeUInt8(eventType, 4);
+			write(buffer);
+		}
+		public function sendRestart():void{
+			var buffer:LegitBuffer = new LegitBuffer();
+			buffer.write("REST");
 			write(buffer);
 		}
 	}
