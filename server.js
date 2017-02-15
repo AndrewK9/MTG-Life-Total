@@ -414,19 +414,20 @@ class Client {
 		this.sock.write(MTGP.buildHostResponce(this.matchCode));
 	}
 	readPacketStart(){
+		this.splitBufferAt(4);
 		//console.log("A player tried to start, let's see what happens.");
 		//A player has pressed the start button, we need to try to start thier match
 		this.server.attemptMatchStart(this.matchCode, this);
-		this.splitBufferAt(4);
+		
 	}
 	readPacketInput(){
 		//console.log(this.buffer.length);
 		if(this.buffer.length < 5) return;
 		const inputType = this.buffer.readUInt8(4);
+		this.splitBufferAt(5);
 		//console.log("I am reading packet input: " + inputType);
 		//Now that we have the input type, we can pass it to the server
 		this.match.handlePlayerInput(inputType, this);
-		this.splitBufferAt(5);
 	}
 }
 
@@ -463,23 +464,23 @@ class Match{
 	minusHealth(client){
 		client.health--;
 		if(client.health < 0) client.health = 0;
-		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost health");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost health " + client.health);
 		this.broadcastUpdate(client);
 	}
 	addHealth(client){
 		client.health++;
-		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained health");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained health " + client.health);
 		this.broadcastUpdate(client);
 	}
 	minusInfect(client){
 		client.infect--;
 		if(client.infect < 0) client.infect = 0;
-		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost infect");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost infect " + client.infect);
 		this.broadcastUpdate(client);
 	}
 	addInfect(client){
 		client.infect++;
-		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained infect");
+		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained infect " + client.infect);
 		this.broadcastUpdate(client);
 	}
 	broadcastUpdate(client){

@@ -33,9 +33,11 @@
 			}
 		}
 		private function tryReadingPacket():Boolean {
-			trace(buffer.toString());
+			//trace(buffer.length);
+			if(buffer.length < 4) return false;
 			switch(getNextPacketType()){
 				case "":
+					trace("Buffers too short");
 					break;
 				case "NERR":
 					readPacketNameError();
@@ -65,6 +67,7 @@
 					readPacketPrivateUpdate();
 					break;
 				default:
+					trace("I don't have this packet");
 					return false;
 					break;
 			}
@@ -183,6 +186,7 @@
 			buffer.trim(8);
 			trace(">"+playerID + "<>" + health+"<>"+infect+"<>"+username+"<");
 			Game.startUpdate(playerID, health, infect, username, maxInfect);
+			tryReadingPacket();
 		}
 		private function readPacketUpdate():void{
 			if(buffer.length < 7) return;
@@ -192,6 +196,7 @@
 			buffer.trim(7);
 			trace(">"+id+"<>"+health+"<>"+infect+"<");
 			Game.update(id, health, infect);
+			tryReadingPacket();
 		}
 		private function readPacketPrivateUpdate():void{
 			if(buffer.length < 6) return;
@@ -199,6 +204,7 @@
 			var infect = buffer.readUInt8(5);
 			buffer.trim(6);
 			Game.privateUpdate(health, infect);
+			tryReadingPacket();
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.17] - 2017-02-15
+### Chagned
+- The readPacketUpdate, readPacketPrivateUpdate, and readPacketStartUpdate all call the tryReadingPacket function when they are done. Mobile devices had lag and a major buffer backlog and becuase the tryReadingPacket function doesn't endlessly loop the player would get behind on updates.
+- tryReadingPacket now checks the length of the buffer, if it's less than 4 we return out of the function.
+
 ## [1.1.16] - 2017-02-15
 ### Added
 - Connection.as handles update packets and passes the parsed info to Game.as who trys to send it to the update function in GSMatch.
