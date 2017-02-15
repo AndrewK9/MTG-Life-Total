@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.0] - 2017-02-15
+### Added
+- Merged feat/BattleScreen with the development for version 1.2.0
+
 ## [1.1.18] - 2017-02-15
 ### Added
 - broadcastRageQuit sends an update packet to everyone, the player symbol won't go away but it will say they are dead.
