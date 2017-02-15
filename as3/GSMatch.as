@@ -7,13 +7,13 @@ package as3 {
 	
 	public class GSMatch extends GameScene {
 
-		var playerPos1:Object = {x:18,y:52};
-		var playerPos2:Object = {x:250,y:52};
-		var playerPos3:Object = {x:18,y:164};
-		var playerPos4:Object = {x:250,y:164};
-		var playerPos5:Object = {x:18,y:276};
-		var playerPos6:Object = {x:250,y:276};
-		var playerPos7:Object = {x:18,y:388};
+		var playerPos1:Object = {x:31.5,y:33.85};
+		var playerPos2:Object = {x:255.7,y:33.85};
+		var playerPos3:Object = {x:31.5,y:141.55};
+		var playerPos4:Object = {x:255.7,y:141.55};
+		var playerPos5:Object = {x:31.5,y:247.1};
+		var playerPos6:Object = {x:255.7,y:247.1};
+		var playerPos7:Object = {x:144.1,y:359.05};
 
 		var players:Array = new Array();
 
@@ -46,13 +46,15 @@ package as3 {
 				Game.socket.sendInput(eventType);
 			}
 		}
-		public function startUpdate(playerID, health, infect, username):void{
+		public function startUpdate(playerID, health, infect, username, maxInfect):void{
 			//TODO: This will run every time we get a new player from the servers players array
 			//We need to spawn a Player object and position it and store it in an array
-			var newPlayer:Player = new Player(playerID, username, health, infect);
+			var newPlayer:Player = new Player(playerID, username, health, infect, maxInfect);
 			addChild(newPlayer);
 			players.push(newPlayer);
 			trace(">Loaded new player: " + username);
+			newPlayer.txtName.text = username;
+			newPlayer.update(health, infect);
 			positionNewPlayer(newPlayer);
 		}
 		private function positionNewPlayer(newPlayer):void{

@@ -171,7 +171,7 @@
 			var playerID = buffer.readUInt8(4);
 			var health = buffer.readUInt8(5);
 			var infect = buffer.readUInt8(6);
-			var maxInfect = bufferType.reading(7);
+			var maxInfect = buffer.readUInt8(7);
 			buffer.trim(8);
 			var username = buffer.toString();
 			buffer.trim(8);

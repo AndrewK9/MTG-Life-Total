@@ -485,10 +485,9 @@ class Match{
 		});
 	}
 	calculateMatch(){
-		console.log("["+this.match.code.toUpperCase()+"] Generated a starting health of: " + this.startingHealth + " and max infect of: " + this.maxInfect);
 		this.startingHealth = this.players.length * 10;
 		this.maxInfect = this.startingHealth/2;
-
+		console.log("["+this.code.toUpperCase()+"] Generated a starting health of: " + this.startingHealth + " and max infect of: " + this.maxInfect);
 		this.players.map((player)=>{
 			player.health = this.startingHealth;
 			player.infect = 0;
