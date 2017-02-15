@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.15] - 2017-02-14
+### Changed
+- Fixed removeFromMatch function, it now checks to see if the match is running. Before it was trying to update the GSLobby screen but if a player left during the match it would crash the app. Now we have a broadcastRageQuit function in the Match class that kills the player. They still get removed from the players array and the clients array. I will have to figure out how to deal with this, maybe send an update to the players to kill the player and ignore them?
+
 ## [1.1.14] - 2017-02-14
 ### Added
 - We now set the Player symbols name to the username the server gives us.

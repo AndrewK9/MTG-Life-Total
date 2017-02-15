@@ -96,7 +96,8 @@ class Server {
 					//The player is a client, we should update the lobby
 					match.players.splice(match.players.indexOf(client), 1);
 					console.log("["+match.code.toUpperCase()+"] Has " + match.players.length + "/" + match.maxPlayers + " players");
-					this.broadcastNewGSLobbyPlayer(match.code, match.players.length);
+					if(!match.hasStarted) this.broadcastNewGSLobbyPlayer(match.code, match.players.length);
+					else match.broadcastRageQuit(client);
 					if(match.players.length <= 0) {
 						//The match is now empty, let's remove it
 						console.log("["+match.code.toUpperCase()+"] Is empty and has been removed");
@@ -422,7 +423,7 @@ class Client {
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.maxPlayers = 2;
+		this.maxPlayers = 3;
 		this.players = [];
 		this.spectators = [];
 		this.hasStarted = false;
@@ -520,6 +521,10 @@ class Match{
 		this.spectators.map((spec)=>{
 			spec.sock.write(MTGP.buildStartPacket(spec.isPlayer));
 		});
+	}
+	broadcastRageQuit(client){
+		client.isDead = true;
+		client.health = 0;
 	}
 }
 

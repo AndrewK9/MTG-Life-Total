@@ -54,7 +54,7 @@ package as3 {
 			players.push(newPlayer);
 			trace(">Loaded new player: " + username);
 			newPlayer.txtName.text = username;
-			newPlayer.update(health, infect);
+			newPlayer.update(health, infect)
 			positionNewPlayer(newPlayer);
 		}
 		private function positionNewPlayer(newPlayer):void{
