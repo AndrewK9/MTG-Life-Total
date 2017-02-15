@@ -51,13 +51,14 @@ const MTGP = {
 		packet.writeUInt8(client.infect, 6);
 		return packet;
 	},
-	buildStartUpdatePacket: (player) => {
-		const packet = Buffer.alloc(15);
+	buildStartUpdatePacket: (player, match) => {
+		const packet = Buffer.alloc(16);
 		packet.write("GSUD");
 		packet.writeUInt8(player.id, 4);
 		packet.writeUInt8(player.health, 5);
 		packet.writeUInt8(player.infect, 6);
-		packet.write(player.username, 7);
+		packet.writeUInt8(match.maxInfect, 7)
+		packet.write(player.username, 8);
 		return packet;
 	},
 };
@@ -74,7 +75,7 @@ class Server {
 			this.id++;
 		});
 		this.sock.listen(this.port, () => {
-			console.log("++[STARTRING SERVER]++")
+			console.log("++[STARTRING SERVER]++");
 			console.log("[SERVER] The server is running on port " + this.port);
 		});
 	}
@@ -405,7 +406,7 @@ class Client {
 		this.sock.write(MTGP.buildHostResponce(this.matchCode));
 	}
 	readPacketStart(){
-		console.log("A player tried to start, let's see what happens.");
+		//console.log("A player tried to start, let's see what happens.");
 		//A player has pressed the start button, we need to try to start thier match
 		this.server.attemptMatchStart(this.matchCode, this);
 	}
@@ -484,7 +485,7 @@ class Match{
 		});
 	}
 	calculateMatch(){
-		console.log("Creating the starting lift and max infect");
+		console.log("["+this.match.code.toUpperCase()+"] Generated a starting health of: " + this.startingHealth + " and max infect of: " + this.maxInfect);
 		this.startingHealth = this.players.length * 10;
 		this.maxInfect = this.startingHealth/2;
 
@@ -495,23 +496,23 @@ class Match{
 		});
 	}
 	releaseTheClients(){
-		console.log("Updating all players about each other");
+		//console.log("Updating all players about each other");
 		this.players.map((player1)=>{
 			this.players.map((player2)=>{
 				if(player1 != player2){
-					player1.sock.write(MTGP.buildStartUpdatePacket(player2));
+					player1.sock.write(MTGP.buildStartUpdatePacket(player2, this));
 				}
 			});
 		});
 
 		this.spectators.map((spec)=>{
 			this.players.map((player)=>{
-				spec.sock.write(MTGP.buildStartUpdatePacket(player));
+				spec.sock.write(MTGP.buildStartUpdatePacket(player, this));
 			});
 		});
 	}
 	broadcastStartMatch(){
-		console.log("Finding clients in the match and telling them to start");
+		//console.log("Finding clients in the match and telling them to start");
 
 		this.players.map((player)=>{
 			player.sock.write(MTGP.buildStartPacket(player.isPlayer));

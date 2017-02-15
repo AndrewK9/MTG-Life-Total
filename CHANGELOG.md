@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.13] - 2017-02-14
+### Added
+- An update function in Player.as. It requires an incoming life and infect number, if the infect is over the max infect or the life is below or equal to 0 we set the values to "RIP". We then set the dynamic text boxes to match the values.
+
+### Changed
+- When sending the players to each client we include the maxInfect value.
+- Cleaned the servers console.logs by removing them or making them match the style.
+- Cleaned the clients traces by removing them or making them match the style.
+
 ## [1.1.12] - 2017-02-14
 ### Added
 - GSMatch's handleInput function now calls sendInput in the Connection script.

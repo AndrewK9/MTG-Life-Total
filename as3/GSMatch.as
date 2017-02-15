@@ -52,11 +52,11 @@ package as3 {
 			var newPlayer:Player = new Player(playerID, username, health, infect);
 			addChild(newPlayer);
 			players.push(newPlayer);
-			trace(">Loaded new player" + username);
+			trace(">Loaded new player: " + username);
 			positionNewPlayer(newPlayer);
 		}
 		private function positionNewPlayer(newPlayer):void{
-			trace("Player had their position set");
+			//trace("Player had their position set");
 			switch(players.length){
 				case 1:
 				    newPlayer.x = playerPos1.x;

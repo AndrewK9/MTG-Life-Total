@@ -8,18 +8,26 @@ package as3 {
 		public var pname = "";
 		public var life = 0;
 		public var infect = 0;
-		
-		public function Player(playerID:Number, playerName:String, playerLife:Number, playerInfect:Number) {
+		public var maxInfect = 0;
+
+		public function Player(playerID:Number, playerName:String, playerLife:Number, playerInfect:Number, maximumInfect:Number) {
 			id = playerID;
 			pname = playerName;
 			life = playerLife;
 			infect = playerInfect;
-
-			
-			trace("=============[Loaded Player Events]==============");
+			maxInfect = maximumInfect;
 		}	
-		public override function dispose():void {
-			trace("=============[Unloaded Player Events]==============");
+		public function update(incomingLife, incomingInfect){
+			life = incomingLife;
+			infect = incomingInfect;
+
+			if(infect >= maxInfect || life <= 0){
+				infect = "RIP";
+				life = "RIP";
+			}
+
+			txtHealth.text = life.toString();
+			txtInfect.text = infect.toString();
 		}
 	}
 	

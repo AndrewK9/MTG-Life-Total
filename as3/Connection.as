@@ -83,19 +83,19 @@
 
 			switch(errCode){
 				case 1:
-					trace("Username was too short");
+					trace(">Username was too short");
 					Game.updateLoginErrorMessage("Username is too short.");
 					break;
 				case 2:
-					trace("Username was too long");
+					trace(">Username was too long");
 					Game.updateLoginErrorMessage("Username is too long.");
 					break;
 				case 3:
-					trace("Username was invalid");
+					trace(">Username was invalid");
 					Game.updateLoginErrorMessage("Username was invalid.");
 					break;
 				default:
-					trace("Unknown username error");
+					trace(">Unknown username error");
 					Game.updateLoginErrorMessage("An unknown error occurred.");
 					break;
 			}
@@ -108,11 +108,11 @@
 
 			switch(errCode){
 				case 2:
-					trace("Match code was invalid");
+					trace(">Match code was invalid");
 					Game.updateLoginErrorMessage("Your match code was invalid.");
 					break;
 				default:
-					trace("Unknown match code error");
+					trace(">Unknown match code error");
 					Game.updateLoginErrorMessage("An unknown error occurred.");
 					break;
 			}
@@ -128,20 +128,20 @@
 
 			switch(responceType){
 				case 0:
-					trace("We're a player in the match");
+					trace(">We're a player in the match");
 					Game.showScene(new GSLobby(matchCode, numOfPlayer, true));
 					break;
 				case 1:
-					trace("We're a sepctator");
+					trace(">We're a sepctator");
 					Game.showScene(new GSLobby(matchCode, numOfPlayer, false));
 					break;
 				default:
-					trace("Unknown responce type");
+					trace(">Unknown responce type");
 					break;
 			}
 		}
 		private function readPacketHostResponce():void{
-			trace("I recieved a host responce packet");
+			//trace("I recieved a host responce packet");
 			//TODO: Send user to the lobby screen
 			if(buffer.length < 10) return;
 			buffer.trim(4);
@@ -151,7 +151,7 @@
 			Game.showScene(new GSLobby(matchCode, 1, true));
 		}
 		private function readPacketLobbyUpdate():void{
-			trace("I recieved a lobby update packet");
+			//trace("I recieved a lobby update packet");
 			if(buffer.length < 5) return;
 			var numOfPlayer = buffer.readUInt8(4);
 			buffer.trim(5);
@@ -159,23 +159,24 @@
 			Game.updateLobbyStatus(numOfPlayer);
 		}
 		private function readPacketStart():void{
-			trace("I recieved a start packet");
+			//trace("I recieved a start packet");
 			if(buffer.length < 5) return;
 			var isPlayer = buffer.readUInt8(4) ? true : false;
 			buffer.trim(5);
 			Game.showScene(new GSMatch(isPlayer));
 		}
 		private function readPacketStartUpdate():void{
-			trace("I shold be reading start update packets");
-			if(buffer.length < 8) return;
+			//trace("I shold be reading start update packets");
+			if(buffer.length < 10) return;
 			var playerID = buffer.readUInt8(4);
 			var health = buffer.readUInt8(5);
 			var infect = buffer.readUInt8(6);
-			buffer.trim(7);
+			var maxInfect = bufferType.reading(7);
+			buffer.trim(8);
 			var username = buffer.toString();
 			buffer.trim(8);
 			trace(">"+playerID + "<>" + health+"<>"+infect+"<>"+username+"<");
-			Game.startUpdate(playerID, health, infect, username);
+			Game.startUpdate(playerID, health, infect, username, maxInfect);
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {

@@ -67,11 +67,11 @@ package as3 {
 			}
 		}
 		public static function updateLobbyStatus(numOfPlayers:Number):void{
-			trace("I ran updateLobbyStatus but IDK if we are in the lobby or wat");
+			//trace("I ran updateLobbyStatus but IDK if we are in the lobby or wat");
 			if(main.scene.txtLobby != null) main.scene.txtLobby.text = numOfPlayers.toString() + "/8 players in the lobby.";
 		}
 		public static function startUpdate(playerID, health, infect, username):void{
-			trace("I ran startUpdate in Game.as, but IDK if we are in the match yet...");
+			//trace("I ran startUpdate in Game.as, but IDK if we are in the match yet...");
 			try{
 				main.scene.startUpdate(playerID, health, infect, username);
 			}catch(e:Error){
