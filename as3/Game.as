@@ -78,6 +78,20 @@ package as3 {
 				trace("Error: " + e);
 			}
 		}
+		public static function update(playerID, health, infect):void{
+			try{
+				main.scene.update(playerID, health, infect);
+			}catch(e:Error){
+				trace("Error: " + e);
+			}
+		}
+		public static function privateUpdate(health, infect):void{
+			try{
+				main.scene.privateUpdate(health, infect);
+			}catch(e:Error){
+				trace("Error: " + e);
+			}
+		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;
 			scene.x = 0;

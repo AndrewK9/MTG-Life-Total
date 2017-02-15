@@ -46,15 +46,22 @@ const MTGP = {
 	buildUpdate: (client)=>{
 		const packet = Buffer.alloc(7);
 		packet.write("UPDT");
-		packet.writeUInt8(client.id, 4);
+		packet.writeUInt8(client.playerid, 4);
 		packet.writeUInt8(client.health, 5);
 		packet.writeUInt8(client.infect, 6);
+		return packet;
+	},
+	buildPrivateUpdate: (client)=>{
+		const packet = Buffer.alloc(6);
+		packet.write("PUDT");
+		packet.writeUInt8(client.health, 4);
+		packet.writeUInt8(client.infect, 5);
 		return packet;
 	},
 	buildStartUpdatePacket: (player, match) => {
 		const packet = Buffer.alloc(16);
 		packet.write("GSUD");
-		packet.writeUInt8(player.id, 4);
+		packet.writeUInt8(player.playerid, 4);
 		packet.writeUInt8(player.health, 5);
 		packet.writeUInt8(player.infect, 6);
 		packet.writeUInt8(match.maxInfect, 7)
@@ -455,6 +462,7 @@ class Match{
 	}
 	minusHealth(client){
 		client.health--;
+		if(client.health < 0) client.health = 0;
 		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost health");
 		this.broadcastUpdate(client);
 	}
@@ -465,15 +473,18 @@ class Match{
 	}
 	minusInfect(client){
 		client.infect--;
+		if(client.infect < 0) client.infect = 0;
 		console.log("["+this.code.toUpperCase()+"] " + client.username + " lost infect");
 		this.broadcastUpdate(client);
 	}
 	addInfect(client){
-		client.health++;
+		client.infect++;
 		console.log("["+this.code.toUpperCase()+"] " + client.username + " gained infect");
 		this.broadcastUpdate(client);
 	}
 	broadcastUpdate(client){
+		client.sock.write(MTGP.buildPrivateUpdate(client));
+
 		this.players.map((player)=>{
 			if(player != client){
 				player.sock.write(MTGP.buildUpdate(client));

@@ -33,7 +33,7 @@
 			}
 		}
 		private function tryReadingPacket():Boolean {
-			
+			trace(buffer.toString());
 			switch(getNextPacketType()){
 				case "":
 					break;
@@ -57,6 +57,12 @@
 					break;
 				case "GSUD":
 					readPacketStartUpdate();
+					break;
+				case "UPDT":
+					readPacketUpdate();
+					break;
+				case "PUDT":
+					readPacketPrivateUpdate();
 					break;
 				default:
 					return false;
@@ -177,6 +183,22 @@
 			buffer.trim(8);
 			trace(">"+playerID + "<>" + health+"<>"+infect+"<>"+username+"<");
 			Game.startUpdate(playerID, health, infect, username, maxInfect);
+		}
+		private function readPacketUpdate():void{
+			if(buffer.length < 7) return;
+			var id = buffer.readUInt8(4);
+			var health = buffer.readUInt8(5);
+			var infect = buffer.readUInt8(6);
+			buffer.trim(7);
+			trace(">"+id+"<>"+health+"<>"+infect+"<");
+			Game.update(id, health, infect);
+		}
+		private function readPacketPrivateUpdate():void{
+			if(buffer.length < 6) return;
+			var health = buffer.readUInt8(4);
+			var infect = buffer.readUInt8(5);
+			buffer.trim(6);
+			Game.privateUpdate(health, infect);
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {

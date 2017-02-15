@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.1.16] - 2017-02-15
+### Added
+- Connection.as handles update packets and passes the parsed info to Game.as who trys to send it to the update function in GSMatch.
+- When loading players we now assign the txtHealth and txtInfect text boxes to the correct values.
+- GSMatch now has an update function that loops through all the players and finds the matching ID. We when call that players update function and pass in the new health and infect numbers.
+- When broadcasting update we send a private update to the player who sent the input.
+- Connection.as now handles private update packets.
+- We display the update to the players health/infect text boxes with a privateUpdate function.
+
+### Changed
+- When building update packets we were using client.id not client.playerId. This bug has been fixed.
+
 ## [1.1.15] - 2017-02-14
 ### Changed
 - Forgot to use this.splitBufferAt to remove the packets from the buffer after we handle them for the start message, it was getting called over and over again when a new packet was being sent.

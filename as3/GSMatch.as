@@ -19,6 +19,7 @@ package as3 {
 
 		var ourHealth = 0;
 		var ourInfect = 0;
+		var infectKillAt = 0;
 		var isDead = true;
 
 		public function GSMatch(isPlayer:Boolean) {
@@ -56,6 +57,29 @@ package as3 {
 			newPlayer.txtName.text = username;
 			newPlayer.update(health, infect)
 			positionNewPlayer(newPlayer);
+			txtHealth.text = health;
+			txtInfect.text = infect;
+			infectKillAt = maxInfect; 
+		}
+		public function update(playerID, newHealth, newInfect):void{
+			for(var k = 0; k < players.length; k++){
+				if(players[k].id == playerID){
+					players[k].update(newHealth, newInfect);
+					break;
+				}
+			}
+		}
+		public function privateUpdate(newHealth, newInfect):void{
+			ourHealth = newHealth;
+			ourInfect = newInfect;
+
+			if(ourInfect >= infectKillAt || ourHealth <= 0){
+				ourHealth = "RIP";
+				ourInfect = "RIP";
+			}
+
+			txtHealth.text = ourHealth.toString();
+			txtInfect.text = ourInfect.toString();
 		}
 		private function positionNewPlayer(newPlayer):void{
 			//trace("Player had their position set");
