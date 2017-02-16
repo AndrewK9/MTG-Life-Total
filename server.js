@@ -90,7 +90,7 @@ const MTGP = {
 
 class Server {
 	constructor(){
-		this.port = 1234;
+		this.port = 2231;
 		this.clients = [];
 		this.matches = [];
 		this.id = 0;
@@ -473,7 +473,7 @@ class Client {
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.maxPlayers = 2;
+		this.maxPlayers = 8;
 		this.players = [];
 		this.spectators = [];
 		this.hasStarted = false;

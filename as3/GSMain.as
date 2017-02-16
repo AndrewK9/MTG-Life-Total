@@ -6,8 +6,8 @@ package as3 {
 	
 	public class GSMain extends GameScene {
 
-		private var usIP:String = "127.0.0.1";
-		private var usPort:String = "1234";
+		private var usIP:String = "75.135.157.91";
+		private var usPort:String = "2231";
 
 		private var time:Number = 0;
 		private var waitTime:Number = 10;

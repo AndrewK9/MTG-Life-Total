@@ -36,6 +36,7 @@ package as3 {
 				bttnPlusHealth.visible = false;
 				bttnMinusInfect.visible = false;
 				bttnPlusInfect.visible = false;
+				txtLoading.visible = false;
 				txtHealth.visible = false;
 				txtInfect.visible = false;
 				bgInfect.visible = false;
@@ -141,6 +142,7 @@ package as3 {
 				bttnMinusInfect.addEventListener(MouseEvent.CLICK, handleInput(3));
 				bttnPlusInfect.addEventListener(MouseEvent.CLICK, handleInput(4));
 			}
+			txtLoading.visible = false;
 		}
 		private function handleRestart(e:MouseEvent):void{
 			winnerObject.bttnRestart.removeEventListener(MouseEvent.CLICK, handleRestart);

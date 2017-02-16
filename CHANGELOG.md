@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.5] - 2017-02-16
+### Added
+- In GSMatch there is a _Loading Players_ message until we unlock input.
+- Updated name to Multiplayer Magic.
+- Updated US-East IP info.
+
+### Changed
+- Reset the Matche classes max players back to 8.
+- Updated the PROTOCOL.md file.
+- Generated Protocol.pdf.
+- Updated README.md file.
+
 ## [1.2.4] - 2017-02-16
 ### Added
 - The Match class now sends an _UNLK_ Unlock Input packet to all the players saying that they can add the event listeners to their buttons.

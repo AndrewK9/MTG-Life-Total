@@ -18,11 +18,11 @@
 -->
 <application xmlns="http://ns.adobe.com/air/application/23.0">
   <id>MultiplayerMagic</id>
-  <versionNumber>1.2.4</versionNumber>
+  <versionNumber>2.0.0</versionNumber>
   <versionLabel/>
-  <filename>Multiplayer-Magic</filename>
+  <filename>Multiplayer Magic</filename>
   <description/>
-  <name>Multiplayer-Magic</name>
+  <name>Multiplayer Magic</name>
   <copyright/>
   <initialWindow>
     <content>Multiplayer-MTG.swf</content>
