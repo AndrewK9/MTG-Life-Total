@@ -16,6 +16,10 @@ package as3 {
 			life = playerLife;
 			infect = playerInfect;
 			maxInfect = maximumInfect;
+
+			txtName.text = pname;
+			txtHealth.text = life.toString();
+			txtInfect.text = infect.toString();
 		}	
 		public function update(incomingLife, incomingInfect){
 			life = incomingLife;

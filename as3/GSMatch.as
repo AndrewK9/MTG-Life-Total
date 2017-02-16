@@ -31,16 +31,12 @@ package as3 {
 
 		public function GSMatch(isPlayer:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
-			if(isPlayer){
-				bttnMinusHealth.addEventListener(MouseEvent.CLICK, handleInput(1));
-				bttnPlusHealth.addEventListener(MouseEvent.CLICK, handleInput(2));
-				bttnMinusInfect.addEventListener(MouseEvent.CLICK, handleInput(3));
-				bttnPlusInfect.addEventListener(MouseEvent.CLICK, handleInput(4));
-			}else{
+			if(!isPlayer){
 				bttnMinusHealth.visible = false;
 				bttnPlusHealth.visible = false;
 				bttnMinusInfect.visible = false;
 				bttnPlusInfect.visible = false;
+				txtLoading.visible = false;
 				txtHealth.visible = false;
 				txtInfect.visible = false;
 				bgInfect.visible = false;
@@ -48,7 +44,7 @@ package as3 {
 				chatroomObject = new Chatroom();
 				addChild(chatroomObject);
 				chatroomObject.x = 0;
-				chatroomObject.y = 767;
+				chatroomObject.y = 744;
 				chatroomObject.bttnShowChat.addEventListener(MouseEvent.CLICK, handleToggleChat);
 				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
 			}
@@ -60,7 +56,7 @@ package as3 {
 				chatroomObject.y = 0;
 				chatVisible = true;
 			}else{
-				chatroomObject.y = 767;
+				chatroomObject.y = 744;
 				chatVisible = false;
 			}
 		}
@@ -93,8 +89,7 @@ package as3 {
 			addChild(newPlayer);
 			players.push(newPlayer);
 			trace(">Loaded new player: " + username);
-			newPlayer.txtName.text = username;
-			newPlayer.update(health, infect)
+			//trace(playerID+"|"+health+"|"+infect+"|"+username+"|"+maxInfect);
 			positionNewPlayer(newPlayer);
 			txtHealth.text = health;
 			txtInfect.text = infect;
@@ -138,6 +133,16 @@ package as3 {
 				winnerObject.bttnRestart.visible = false;
 				winnerObject.bttnQuit.visible = false;
 			}
+		}
+		public function unlockInput():void{
+			trace(">Input unlocked");
+			if(player){
+				bttnMinusHealth.addEventListener(MouseEvent.CLICK, handleInput(1));
+				bttnPlusHealth.addEventListener(MouseEvent.CLICK, handleInput(2));
+				bttnMinusInfect.addEventListener(MouseEvent.CLICK, handleInput(3));
+				bttnPlusInfect.addEventListener(MouseEvent.CLICK, handleInput(4));
+			}
+			txtLoading.visible = false;
 		}
 		private function handleRestart(e:MouseEvent):void{
 			winnerObject.bttnRestart.removeEventListener(MouseEvent.CLICK, handleRestart);

@@ -81,11 +81,16 @@ const MTGP = {
 		packet.write(message, 12);
 		return packet;
 	},
+	buildUnlockPacket: ()=>{
+		const packet = Buffer.alloc(4);
+		packet.write("UNLK");
+		return packet;
+	},
 };
 
 class Server {
 	constructor(){
-		this.port = 1234;
+		this.port = 2231;
 		this.clients = [];
 		this.matches = [];
 		this.id = 0;
@@ -468,7 +473,7 @@ class Client {
 class Match{
 	constructor(matchCode){
 		this.code = matchCode;
-		this.maxPlayers = 2;
+		this.maxPlayers = 8;
 		this.players = [];
 		this.spectators = [];
 		this.hasStarted = false;
@@ -597,6 +602,17 @@ class Match{
 				spec.sock.write(MTGP.buildStartUpdatePacket(player, this));
 			});
 		});
+
+		this.unlockInput();
+	}
+	unlockInput(){
+		//Delay the message so the clients can handle all the new players
+		//Should replace with a listerner where we wait for all players to return a ready message
+		setTimeout(()=>{
+			this.players.map((player)=>{
+				player.sock.write(MTGP.buildUnlockPacket());
+			});
+		}, 2000);
 	}
 	broadcastStartMatch(){
 		//console.log("Finding clients in the match and telling them to start");
