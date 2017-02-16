@@ -99,6 +99,14 @@ package as3 {
 				trace("Error: " + e);
 			}
 		}
+		public static function chatMessages(username, incomingMessage):void{
+			try{
+				trace(incomingMessage);
+				main.scene.displayChat(username, incomingMessage);
+			}catch(e:Error){
+				trace("Error: " + e);
+			}
+		}
 		public static function showScene(scene:GameScene):void {
 			hideScene = true;
 			scene.x = 0;

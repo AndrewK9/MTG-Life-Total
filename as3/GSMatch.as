@@ -24,7 +24,10 @@ package as3 {
 		var isDead = true;
 		var player = false;
 
+		var chatVisible = false;
+
 		var winnerObject;
+		var chatroomObject;
 
 		public function GSMatch(isPlayer:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
@@ -42,9 +45,40 @@ package as3 {
 				txtInfect.visible = false;
 				bgInfect.visible = false;
 				bgHealth.visible = false;
+				chatroomObject = new Chatroom();
+				addChild(chatroomObject);
+				chatroomObject.x = 0;
+				chatroomObject.y = 767;
+				chatroomObject.bttnShowChat.addEventListener(MouseEvent.CLICK, handleToggleChat);
+				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
 			}
 			player = isPlayer;
 			trace("=============[Loaded Match Events]==============");
+		}
+		private function handleToggleChat(e:MouseEvent):void{
+			if(!chatVisible){
+				chatroomObject.y = 0;
+				chatVisible = true;
+			}else{
+				chatroomObject.y = 767;
+				chatVisible = false;
+			}
+		}
+		private function handleChatSubmit(e:KeyboardEvent):void{
+			if(e.keyCode == 13) sendMsg();
+		}
+		private function sendMsg():void{
+			Game.socket.sendMessage(chatroomObject.inputChat.text);
+			chatroomObject.inputChat.text = "";
+		}
+		public function displayChat(username, incomingMessage:String):void{
+			//trace(incomingMessage);
+			//chatroomObject.txtChat.text = incomingMessage;
+			chatroomObject.txtChatBox.text += username;
+			chatroomObject.txtChatBox.text += ": ";
+			chatroomObject.txtChatBox.text += incomingMessage;
+			chatroomObject.txtChatBox.text += "\n";
+			chatroomObject.txtChatBox.scrollV = chatroomObject.txtChatBox.maxScrollV;
 		}
 		private function handleInput(eventType:Number):Function{
 			return function(e:MouseEvent):void{
@@ -64,7 +98,8 @@ package as3 {
 			positionNewPlayer(newPlayer);
 			txtHealth.text = health;
 			txtInfect.text = infect;
-			infectKillAt = maxInfect; 
+			infectKillAt = maxInfect;
+			chatroomObject.parent.setChildIndex(chatroomObject, chatroomObject.parent.numChildren - 1);
 		}
 		public function update(playerID, newHealth, newInfect):void{
 			for(var k = 0; k < players.length; k++){
@@ -146,10 +181,15 @@ package as3 {
 			}
 		}
 		public override function dispose():void {
-			bttnMinusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnPlusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnMinusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnPlusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+			if(!player) {
+				chatroomObject.bttnShowChat.removeEventListener(MouseEvent.CLICK, handleToggleChat);
+				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
+			}else{
+				bttnMinusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnPlusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnMinusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnPlusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+			}
 			trace("=============[Unloaded Match Events]==============");
 		}
 	}

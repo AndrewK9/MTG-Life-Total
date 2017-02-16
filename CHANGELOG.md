@@ -6,6 +6,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.3] - 2017-02-15
+### Added
+- Added scrollV to the chat text box to auto scroll when new messages arrive.
+
+### Changed
+- Stoped using HTML text due to a possible issue with the android verson. We now user the basic .text when addings messages to the chat.
+
+## [1.2.2] - 2017-02-15
+### Added
+- Fixed issue by setting client.match equal to the match in the checkForMatch function for spectators.
+- Added a chatMessage function to the Match class, it loops through all the spectators and broadcast the chat messages.
+- Connection.as parses message packets.
+- Set max characters on the chat messages to 120.
+- Connection.as passes the chat messages to the GSMatch screen so we can display the messages.
+
+## [1.2.1] - 2017-02-15
+### Added
+- Designed the spectator chatroom.
+- The chat button will toggle the chatroom into position.
+
 ## [1.2.0] - 2017-02-15
 ### Added
 - Merged feat/BattleScreen with the development for version 1.2.0
