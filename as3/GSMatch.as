@@ -50,6 +50,7 @@ package as3 {
 				chatroomObject.x = 0;
 				chatroomObject.y = 767;
 				chatroomObject.bttnShowChat.addEventListener(MouseEvent.CLICK, handleToggleChat);
+				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
 			}
 			player = isPlayer;
 			trace("=============[Loaded Match Events]==============");
@@ -62,6 +63,25 @@ package as3 {
 				chatroomObject.y = 767;
 				chatVisible = false;
 			}
+		}
+		private function handleChatSubmit(e:KeyboardEvent):void{
+			if(e.keyCode == 13) sendMsg();
+		}
+		private function sendMsg():void{
+			Game.socket.sendMessage(chatroomObject.inputChat.text);
+			chatroomObject.inputChat.text = "";
+		}
+		public function displayChat(username, incomingMessage:String):void{
+			//trace(incomingMessage);
+			//chatroomObject.txtChat.text = incomingMessage;
+			var tmpTxt = "<FONT SIZE='16' COLOR='#E57D11'>";
+			tmpTxt += username;
+			tmpTxt += "</FONT>";
+			tmpTxt += "<FONT SIZE='15' COLOR='#FFFFFF'>";
+			tmpTxt += ": ";
+			tmpTxt += incomingMessage;
+			tmpTxt += "</FONT>";
+			chatroomObject.txtChatBox.htmlText += tmpTxt;
 		}
 		private function handleInput(eventType:Number):Function{
 			return function(e:MouseEvent):void{
@@ -164,11 +184,15 @@ package as3 {
 			}
 		}
 		public override function dispose():void {
-			bttnMinusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnPlusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnMinusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
-			bttnPlusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
-			chatroomObject.bttnShowChat.removeEventListener(MouseEvent.CLICK, handleToggleChat);
+			if(!player) {
+				chatroomObject.bttnShowChat.removeEventListener(MouseEvent.CLICK, handleToggleChat);
+				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
+			}else{
+				bttnMinusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnPlusHealth.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnMinusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+				bttnPlusInfect.removeEventListener(MouseEvent.CLICK, handleInput);
+			}
 			trace("=============[Unloaded Match Events]==============");
 		}
 	}

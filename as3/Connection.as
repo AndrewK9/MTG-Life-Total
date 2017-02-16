@@ -69,6 +69,9 @@
 				case "GMOV":
 					readPacketGameOver();
 					break;
+				case "BMSG":
+					readPacketMessage();
+					break;
 				default:
 					trace("I don't have this packet");
 					return false;
@@ -216,6 +219,18 @@
 			buffer.trim(8);
 			Game.gameOver(username);
 		}
+		private function readPacketMessage():void{
+			if(buffer.length < 7) return;
+			trace(">"+buffer.toString());
+			var username = buffer.slice(4, 11);
+			username = username.toString();
+			var incomingMessage = buffer.slice(12, 133);
+			incomingMessage = incomingMessage.toString();
+			trace(">"+username+"<>"+incomingMessage+"<");
+			Game.chatMessages(username, incomingMessage);
+			buffer.trim(133);
+			tryReadingPacket();
+		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
 			writeBytes(buffer.byteArray);
@@ -254,6 +269,13 @@
 		public function sendRestart():void{
 			var buffer:LegitBuffer = new LegitBuffer();
 			buffer.write("REST");
+			write(buffer);
+		}
+		public function sendMessage(message):void{
+			var buffer:LegitBuffer = new LegitBuffer();
+			buffer.write("UMSG");
+			buffer.writeUInt8(message.length, 4);
+			buffer.write(message, 5);
 			write(buffer);
 		}
 	}

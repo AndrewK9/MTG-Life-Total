@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.2] - 2017-02-15
+### Added
+- Fixed issue by setting client.match equal to the match in the checkForMatch function for spectators.
+- Added a chatMessage function to the Match class, it loops through all the spectators and broadcast the chat messages.
+- Connection.as parses message packets.
+- Set max characters on the chat messages to 120.
+- Connection.as passes the chat messages to the GSMatch screen so we can display the messages.
+
 ## [1.2.1] - 2017-02-15
 ### Added
 - Designed the spectator chatroom.

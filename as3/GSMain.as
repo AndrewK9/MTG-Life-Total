@@ -103,11 +103,6 @@ package as3 {
 			else if(waitTime <= 0){
 				timesWaited++;
 				waitTime = 10;
-				if(ip.visible){
-					connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
-				}else{
-					connect(usIP, int(usPort));
-				}
 			}
 		}
 		function connect(address:String, port:Number):void {

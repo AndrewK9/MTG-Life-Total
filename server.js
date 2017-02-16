@@ -74,6 +74,13 @@ const MTGP = {
 		packet.write(winner, 4);
 		return packet;
 	},
+	buildChat: (message, username)=>{
+		const packet = Buffer.alloc(133);
+		packet.write("BMSG");
+		packet.write(username, 4);
+		packet.write(message, 12);
+		return packet;
+	},
 };
 
 class Server {
@@ -153,6 +160,7 @@ class Server {
 				}else{
 					//The new player is a spectator
 					match.spectators.push(client);
+					client.match = match;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " is spectating the match");
 					foundMatch = true;
 				}
@@ -345,6 +353,9 @@ class Client {
 			case "REST":
 				this.readPacketRestart();
 				break;
+			case "UMSG":
+				this.readPacketUserMessage();
+				break;
 			default:
 				return false;
 				break;
@@ -438,9 +449,18 @@ class Client {
 		//Now that we have the input type, we can pass it to the server
 		this.match.handlePlayerInput(inputType, this);
 	}
+	readPacketUserMessage(){
+		if(this.buffer.length < 6) return;
+		const messageLength = this.buffer.readUInt8(4);
+		const message = this.buffer.slice(5, 5 + messageLength).toString();
+		this.splitBufferAt(5 + messageLength);
+		//console.log(">"+message+"<");
+		this.match.chatMessage(message, this);
+	}
 	readPacketRestart(){
 		if(this.buffer.length < 4) return;
 		this.splitBufferAt(4);
+		console.log(this.matchCode);
 		this.match.handleRestart();
 	}
 }
@@ -611,6 +631,12 @@ class Match{
 		setTimeout(()=>{
 			this.releaseTheClients();
 		}, 3000);
+	}
+	chatMessage(message, client){
+		console.log("["+this.code.toUpperCase()+"] " + client.username + ": " + message);
+		this.spectators.map((spec)=>{
+			spec.sock.write(MTGP.buildChat(message, client.username));
+		});
 	}
 }
 
