@@ -6,8 +6,8 @@ package as3 {
 	
 	public class GSMain extends GameScene {
 
-		private var usIP:String = "127.0.0.1";
-		private var usPort:String = "1234";
+		private var usIP:String = "75.135.157.91";
+		private var usPort:String = "2231";
 
 		private var time:Number = 0;
 		private var waitTime:Number = 10;
@@ -103,11 +103,6 @@ package as3 {
 			else if(waitTime <= 0){
 				timesWaited++;
 				waitTime = 10;
-				if(ip.visible){
-					connect(ip.inputIPAddress.text, int(port.inputPortNumber.text));
-				}else{
-					connect(usIP, int(usPort));
-				}
 			}
 		}
 		function connect(address:String, port:Number):void {

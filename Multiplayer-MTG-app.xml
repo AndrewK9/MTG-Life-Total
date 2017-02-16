@@ -17,12 +17,12 @@
 	</name>
 -->
 <application xmlns="http://ns.adobe.com/air/application/23.0">
-  <id>MultiplayerMTG</id>
-  <versionNumber>1.1.9</versionNumber>
+  <id>MultiplayerMagic</id>
+  <versionNumber>2.0.0</versionNumber>
   <versionLabel/>
-  <filename>Multiplayer-MTG</filename>
+  <filename>Multiplayer Magic</filename>
   <description/>
-  <name>Multiplayer-MTG</name>
+  <name>Multiplayer Magic</name>
   <copyright/>
   <initialWindow>
     <content>Multiplayer-MTG.swf</content>
@@ -33,7 +33,14 @@
     <aspectRatio>portrait</aspectRatio>
     <renderMode>cpu</renderMode>
     <autoOrients>false</autoOrients></initialWindow>
-  <icon/>
+  <icon>
+    <image36x36>images/icon-36.png</image36x36>
+    <image48x48>images/icon-48.png</image48x48>
+    <image72x72>images/icon-72.png</image72x72>
+    <image96x96>images/icon-96.png</image96x96>
+    <image144x144>images/icon-144.png</image144x144>
+    <image192x192>images/icon-192.png</image192x192>
+  </icon>
   <customUpdateUI>false</customUpdateUI>
   <allowBrowserInvocation>false</allowBrowserInvocation>
   <android>

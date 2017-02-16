@@ -6,6 +6,147 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.0.0] - 2017-02-16 [RELEASE]
+
+## [1.2.5] - 2017-02-16
+### Added
+- In GSMatch there is a _Loading Players_ message until we unlock input.
+- Updated name to Multiplayer Magic.
+- Updated US-East IP info.
+
+### Changed
+- Reset the Matche classes max players back to 8.
+- Updated the PROTOCOL.md file.
+- Generated Protocol.pdf.
+- Updated README.md file.
+
+## [1.2.4] - 2017-02-16
+### Added
+- The Match class now sends an _UNLK_ Unlock Input packet to all the players saying that they can add the event listeners to their buttons.
+- The client now handles _UNLK_ packets.
+
+### Changed
+- New text size for the match code on GSLobby, was 80 and is now 75.
+- Reduced the font size for the clients chatroom message input.
+- Message input is now the length of the screen.
+- The chat button text has ALT symbol arrows that update with the functionality of the button.
+- Adjusted the position of the chat button.
+- The app no longer forces full screen on mobile.
+- The chat toggle button now says _- TOGGLE CHAT -_.
+- We now scale content with the stage.
+
+## [1.2.3] - 2017-02-15
+### Added
+- Added scrollV to the chat text box to auto scroll when new messages arrive.
+
+### Changed
+- Stoped using HTML text due to a possible issue with the android verson. We now user the basic .text when addings messages to the chat.
+
+## [1.2.2] - 2017-02-15
+### Added
+- Fixed issue by setting client.match equal to the match in the checkForMatch function for spectators.
+- Added a chatMessage function to the Match class, it loops through all the spectators and broadcast the chat messages.
+- Connection.as parses message packets.
+- Set max characters on the chat messages to 120.
+- Connection.as passes the chat messages to the GSMatch screen so we can display the messages.
+
+## [1.2.1] - 2017-02-15
+### Added
+- Designed the spectator chatroom.
+- The chat button will toggle the chatroom into position.
+
+## [1.2.0] - 2017-02-15
+### Added
+- Merged feat/BattleScreen with the development for version 1.2.0
+
+## [1.1.18] - 2017-02-15
+### Added
+- broadcastRageQuit sends an update packet to everyone, the player symbol won't go away but it will say they are dead.
+- After handling input the Match class checks for death. If someone dies we run the checkForWin function.
+- checkForWin loops through all the players and counts the deaths, if 0 to 1 player is alive we declare a winner.
+- The broadcastGameOver function loops through everyone connected to the match and sends a _GMOV_ packet.
+- The Game Over packet contains the name of the winner.
+- Connection.as handels _GMOV_ packets by sending the winner to Game.as and then to GSMatch.
+- GSMatch clears the screen with the gameOver function.
+- We spawn a Winner symbol and pass the winners name into it.
+- Winner has two buttons, players can quit the app or restart the match.
+- gameOver hides the buttons if they're a spectator.
+
+## [1.1.17] - 2017-02-15
+### Chagned
+- The readPacketUpdate, readPacketPrivateUpdate, and readPacketStartUpdate all call the tryReadingPacket function when they are done. Mobile devices had lag and a major buffer backlog and becuase the tryReadingPacket function doesn't endlessly loop the player would get behind on updates.
+- tryReadingPacket now checks the length of the buffer, if it's less than 4 we return out of the function.
+
+## [1.1.16] - 2017-02-15
+### Added
+- Connection.as handles update packets and passes the parsed info to Game.as who trys to send it to the update function in GSMatch.
+- When loading players we now assign the txtHealth and txtInfect text boxes to the correct values.
+- GSMatch now has an update function that loops through all the players and finds the matching ID. We when call that players update function and pass in the new health and infect numbers.
+- When broadcasting update we send a private update to the player who sent the input.
+- Connection.as now handles private update packets.
+- We display the update to the players health/infect text boxes with a privateUpdate function.
+
+### Changed
+- When building update packets we were using client.id not client.playerId. This bug has been fixed.
+
+## [1.1.15] - 2017-02-14
+### Changed
+- Forgot to use this.splitBufferAt to remove the packets from the buffer after we handle them for the start message, it was getting called over and over again when a new packet was being sent.
+- Uncommented the update message to the players and spectators, the client doesn't handle these messages yet.
+- Fixed an issue on Game.as where error messages were not appearing on GSLogin. Same reason as before, used same fix.
+
+## [1.1.15] - 2017-02-14
+### Changed
+- Fixed removeFromMatch function, it now checks to see if the match is running. Before it was trying to update the GSLobby screen but if a player left during the match it would crash the app. Now we have a broadcastRageQuit function in the Match class that kills the player. They still get removed from the players array and the clients array. I will have to figure out how to deal with this, maybe send an update to the players to kill the player and ignore them?
+
+## [1.1.14] - 2017-02-14
+### Added
+- We now set the Player symbols name to the username the server gives us.
+- Adjusted the position of the player symbols.
+- We call the Player symbols update function after we spawn it so the lift/infect doesn't say RIP anymore.
+
+### Changed
+- Fixed some issues with the calculate function in the Match class, moved the console.log down below the math and fixed the maxInfect calc, we now user this.startingHealth instead of startinghealth.
+
+## [1.1.13] - 2017-02-14
+### Added
+- An update function in Player.as. It requires an incoming life and infect number, if the infect is over the max infect or the life is below or equal to 0 we set the values to "RIP". We then set the dynamic text boxes to match the values.
+
+### Changed
+- When sending the players to each client we include the maxInfect value.
+- Cleaned the servers console.logs by removing them or making them match the style.
+- Cleaned the clients traces by removing them or making them match the style.
+
+## [1.1.12] - 2017-02-14
+### Added
+- GSMatch's handleInput function now calls sendInput in the Connection script.
+- sendInput writes the input type to the buffer and sends it to the server.
+- The server now handles _UIUP_ (User Input Update) packets by passing them to the Match class' handlePlayerInput function.
+- Added the following properties to Clients:
+	- Health
+	- Infect
+	- Match
+	- isDead
+- We broadcast an Update packet when players send input.
+- The Match class now has a function that caluclates the starting values and assigns them to each player.
+- There is a releaseTheClients function in the Match class that sends buildStartUpdatePacket packets to all the player and spectators. When the client recieves this packet they will parse it and hand the info over to the GSMatch screen were it will spawn the Player object and assign its position and values.
+
+### Changed
+- Pushed buttons on GSMatch up due to issues on mobile devices.
+- Adjusted the invisible buttons position.
+- Set max Match players to 2, should return to 8 after testing.
+- Clients are now assigned a match when they join/spectate.
+- When calling the releaseTheClients function we first wait 3 seconds so the clients can switch to the match screen, this should be updated later so the clients send a _IRDY_ Im Ready packet to the server. Once everyone is ready we can release the clients.
+- In Game.as we now run a try/catch on startUpdate.
+- Also in Game.as we check to see if main.scene.txtLobby isn't null before we set its .text value. This was causing issues where players we not recieving updates becuase main.scene was [gameObject GSLobby] but as3.GSLobby was class GSLobby.
+- In the Servers checkForMaatch function we now only call the broadcastNewGSLobbyPlayer when players after the host are entering. For some reason the host was getting this packet before the Host Responce packet and it was causing the host to get suck on GSLobby.
+
+## [1.1.11] - 2017-02-14
+### Added
+- Designed the player object and the GSMatch screen.
+- Created GSMatch script, it currently stores the player objects positions and adds/removes event listeners. It requires a boolean, based on what is passed in the player is a player or a spectator.
+- Created Player script, it will store the incoming players data. We will need to add an Update function that adjust its health/infect values.
+
 ## [1.1.10] - 2017-02-13
 ### Added
 - GSMain and GSLogin now have invisibile buttons that will force them to exit the option popup menus when they click outside the menu.
