@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.0.0] - 2017-02-16 [RELEASE]
+
 ## [1.2.5] - 2017-02-16
 ### Added
 - In GSMatch there is a _Loading Players_ message until we unlock input.
