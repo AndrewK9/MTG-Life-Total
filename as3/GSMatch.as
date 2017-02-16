@@ -74,14 +74,11 @@ package as3 {
 		public function displayChat(username, incomingMessage:String):void{
 			//trace(incomingMessage);
 			//chatroomObject.txtChat.text = incomingMessage;
-			var tmpTxt = "<FONT SIZE='16' COLOR='#E57D11'>";
-			tmpTxt += username;
-			tmpTxt += "</FONT>";
-			tmpTxt += "<FONT SIZE='15' COLOR='#FFFFFF'>";
-			tmpTxt += ": ";
-			tmpTxt += incomingMessage;
-			tmpTxt += "</FONT>";
-			chatroomObject.txtChatBox.htmlText += tmpTxt;
+			chatroomObject.txtChatBox.text += username;
+			chatroomObject.txtChatBox.text += ": ";
+			chatroomObject.txtChatBox.text += incomingMessage;
+			chatroomObject.txtChatBox.text += "\n";
+			chatroomObject.txtChatBox.scrollV = chatroomObject.txtChatBox.maxScrollV;
 		}
 		private function handleInput(eventType:Number):Function{
 			return function(e:MouseEvent):void{

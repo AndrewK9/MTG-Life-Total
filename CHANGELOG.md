@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [1.2.3] - 2017-02-15
+### Added
+- Added scrollV to the chat text box to auto scroll when new messages arrive.
+
+### Changed
+- Stoped using HTML text due to a possible issue with the android verson. We now user the basic .text when addings messages to the chat.
+
 ## [1.2.2] - 2017-02-15
 ### Added
 - Fixed issue by setting client.match equal to the match in the checkForMatch function for spectators.

@@ -18,8 +18,8 @@
 -->
 <application xmlns="http://ns.adobe.com/air/application/23.0">
   <id>MultiplayerMTG</id>
-  <versionNumber>1.2.1</versionNumber>
-  <versionLabel/>
+  <versionNumber>1.2.3</versionNumber>
+  <versionLabel></versionLabel>
   <filename>Multiplayer-MTG</filename>
   <description/>
   <name>Multiplayer-MTG</name>
