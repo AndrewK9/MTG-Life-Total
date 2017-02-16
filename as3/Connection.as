@@ -72,6 +72,9 @@
 				case "BMSG":
 					readPacketMessage();
 					break;
+				case "UNLK":
+					readPacketUnlockInput();
+					break;
 				default:
 					trace("I don't have this packet");
 					return false;
@@ -229,6 +232,12 @@
 			trace(">"+username+"<>"+incomingMessage+"<");
 			Game.chatMessages(username, incomingMessage);
 			buffer.trim(133);
+			tryReadingPacket();
+		}
+		private function readPacketUnlockInput():void{
+			if(buffer.length < 4) return;
+			buffer.trim(4);
+			Game.unlockInput();
 			tryReadingPacket();
 		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////

@@ -73,16 +73,16 @@ package as3 {
 		public static function startUpdate(playerID, health, infect, username, maxInfect):void{
 			//trace("I ran startUpdate in Game.as, but IDK if we are in the match yet...");
 			try{
+				//trace(playerID+"|"+health+"|"+infect+"|"+username+"|"+maxInfect);
 				main.scene.startUpdate(playerID, health, infect, username, maxInfect);
-			}catch(e:Error){
-				trace("Error: " + e);
-			}
+				}catch(e:Error){
+				}
 		}
 		public static function update(playerID, health, infect):void{
 			try{
 				main.scene.update(playerID, health, infect);
 			}catch(e:Error){
-				trace("Error: " + e);
+				trace("Update Error: " + e);
 			}
 		}
 		public static function privateUpdate(health, infect):void{
@@ -101,7 +101,6 @@ package as3 {
 		}
 		public static function chatMessages(username, incomingMessage):void{
 			try{
-				trace(incomingMessage);
 				main.scene.displayChat(username, incomingMessage);
 			}catch(e:Error){
 				trace("Error: " + e);
@@ -111,6 +110,13 @@ package as3 {
 			hideScene = true;
 			scene.x = 0;
 			newScene = scene;
+		}
+		public static function unlockInput():void{
+			try{
+				main.scene.unlockInput();
+			}catch(e:Error){
+				trace("Unlock Error: " + e);
+			}
 		}
 	}
 }
