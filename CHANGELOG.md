@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.0.3] - 2017-02-17
+### Changed
+- Updated PROTOCOL.md
+
 ## [2.0.2] - 2017-02-17
 ### Added
 - On invalid match message we add text to show that players can host a match.
