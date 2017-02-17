@@ -6,6 +6,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.1.0] - 2017-02-17 [RELEASE]
+
+## [2.0.4] - 2017-02-17
+### Changed
+- Server only allows 1 restart packet, ignores the rest.
+
+## [2.0.3] - 2017-02-17
+### Changed
+- Updated PROTOCOL.md
+
+## [2.0.2] - 2017-02-17
+### Added
+- On invalid match message we add text to show that players can host a match.
+
+### Changed
+- Changed text to static for 'Input Username or Initials' and 'Match Code'.
+
+## [2.0.1] - 2017-02-17
+### Added
+- When clients join mid match we send a _MMIR_ Mid Match Info Request.
+- The server will send them _MMJR_ Mid Match Join Responce.
+- Added a releaseTheClientsMidMatch function that acts like releaseTheClients where it sends player info however this one only sends the players info to the single client who requested it.
+
+### Changed
+- The server no longer sends the Join Responce packet by default, it now sends 3 possible types.
+	1: Join Responce is the normal responce for when players join an open match.
+	2: Match Error will return the error message.
+	3: Join Mid Match tells the spectator that they can join mid match.
+
 ## [2.0.0] - 2017-02-16 [RELEASE]
 
 ## [1.2.5] - 2017-02-16
