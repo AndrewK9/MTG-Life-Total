@@ -75,6 +75,9 @@
 				case "UNLK":
 					readPacketUnlockInput();
 					break;
+				case "JMMR":
+					readPacketJoinMidMatch();
+					break;
 				default:
 					trace("I don't have this packet");
 					return false;
@@ -181,7 +184,7 @@
 			if(buffer.length < 5) return;
 			var isPlayer = buffer.readUInt8(4) ? true : false;
 			buffer.trim(5);
-			Game.showScene(new GSMatch(isPlayer));
+			Game.showScene(new GSMatch(isPlayer, false));
 		}
 		private function readPacketStartUpdate():void{
 			//trace("I shold be reading start update packets");
@@ -240,6 +243,11 @@
 			Game.unlockInput();
 			tryReadingPacket();
 		}
+		private function readPacketJoinMidMatch():void{
+			if(buffer.length < 4) return;
+			buffer.trim(4);
+			Game.showScene(new GSMatch(false, true));
+		}
 		//////////////////////// BUILDING PACKETS: ///////////////////////////////
 		public function write(buffer:LegitBuffer):void {
 			writeBytes(buffer.byteArray);
@@ -285,6 +293,11 @@
 			buffer.write("UMSG");
 			buffer.writeUInt8(message.length, 4);
 			buffer.write(message, 5);
+			write(buffer);
+		}
+		public function sendInfoRequest():void{
+			var buffer:LegitBuffer = new LegitBuffer();
+			buffer.write("MMIR");
 			write(buffer);
 		}
 	}
