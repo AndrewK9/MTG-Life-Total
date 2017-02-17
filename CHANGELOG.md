@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.1.0] - 2017-02-17 [RELEASE]
+
 ## [2.0.4] - 2017-02-17
 ### Changed
 - Server only allows 1 restart packet, ignores the rest.
