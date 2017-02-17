@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.0.2] - 2017-02-17
+### Added
+- On invalid match message we add text to show that players can host a match.
+
+### Changed
+- Changed text to static for 'Input Username or Initials' and 'Match Code'.
+
 ## [2.0.1] - 2017-02-17
 ### Added
 - When clients join mid match we send a _MMIR_ Mid Match Info Request.
