@@ -479,8 +479,8 @@ class Client {
 	readPacketRestart(){
 		if(this.buffer.length < 4) return;
 		this.splitBufferAt(4);
-		console.log(this.matchCode);
-		this.match.handleRestart();
+		//console.log(this.matchCode);
+		if(!this.match.hasStarted) this.match.handleRestart();
 	}
 	readPacketInfoRequest(){
 		setTimeout(()=>{
@@ -575,6 +575,7 @@ class Match{
 		}
 	}
 	broadcastGameOver(winner){
+		this.hasStarted = false;
 		this.players.map((player)=>{
 			player.sock.write(MTGP.buildGameOver(winner));
 		});
@@ -666,6 +667,7 @@ class Match{
 		this.checkForWin();
 	}
 	handleRestart(){
+		this.hasStarted = true;
 		console.log("["+this.code.toUpperCase()+"] Someone restarted the match");
 		this.broadcastStartMatch();
 		this.calculateMatch();
