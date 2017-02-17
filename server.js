@@ -5,6 +5,7 @@ const MTGP = {
 	GOOD: 0,
 	MATCH_FULL: 1,
 	MATCH_INVALID: 2,
+	MATCH_FULL_STARTED: 5,
 	buildNameError: (err) =>{
 		const packet = Buffer.alloc(5);
 		packet.write("NERR");
@@ -86,6 +87,11 @@ const MTGP = {
 		packet.write("UNLK");
 		return packet;
 	},
+	buildJoinMidMatch: ()=>{
+		const packet = Buffer.alloc(4);
+		packet.write("JMMR");
+		return packet;
+	},
 };
 
 class Server {
@@ -148,6 +154,7 @@ class Server {
 		//console.log(">"+matchCode+"<");
 		//console.log(this.matches.length);
 		let foundMatch = false;
+		let matchStarted = false;
 		let isPlayer = false;
 		if(!matchCode.match(/^[a-zA-Z]+$/)) return MTGP.MATCH_INVALID;
 		this.matches.map((match) => {
@@ -168,12 +175,14 @@ class Server {
 					client.match = match;
 					console.log("["+match.code.toUpperCase()+"] " + client.username + " is spectating the match");
 					foundMatch = true;
+					matchStarted = match.hasStarted;
 				}
 			}
 		});
 
 		if(!foundMatch) { return MTGP.MATCH_INVALID; } //We couldn't find a match
-		else if(!isPlayer) { return MTGP.MATCH_FULL; } //The match was full so the client is a spectator
+		else if(!isPlayer && !matchStarted) { return MTGP.MATCH_FULL; } //The match was full so the client is a spectator
+		else if(!isPlayer && matchStarted) { return MTGP.MATCH_FULL_STARTED; }
 		else { return MTGP.GOOD; } //We found the match and there was space for another player
 	}
 	broadcastNewGSLobbyPlayer(code, numOfPlayers){
@@ -361,6 +370,9 @@ class Client {
 			case "UMSG":
 				this.readPacketUserMessage();
 				break;
+			case "MMIR":
+				this.readPacketInfoRequest();
+				break;
 			default:
 				return false;
 				break;
@@ -403,16 +415,18 @@ class Client {
 		//console.log(matchResponce);
 		if(matchResponce === 0 || matchResponce === 1) {
 			this.matchCode = matchCode;
+			this.sock.write(MTGP.buildJoinResponce(matchResponce, this.matchCode, this.server.getLobbyNumber(this.matchCode)));
 			//console.log(this.matchCode.toUpperCase());
 		}
-		if(matchResponce === 2) { 
+		else if(matchResponce === 2) { 
 			this.sock.write(MTGP.buildMatchError(matchResponce));
 			console.log("[ERROR] " + matchCode.toUpperCase() + " is invalid");
 			return;
 		}
-
-		//If we make it this far it means the match code and username were good to go
-		this.sock.write(MTGP.buildJoinResponce(matchResponce, this.matchCode, this.server.getLobbyNumber(this.matchCode)));
+		else if(matchResponce === 5){
+			this.matchCode = matchCode;
+			this.sock.write(MTGP.buildJoinMidMatch());
+		}
 	}
 	readPacketHost(){
 		if(this.buffer.length < 5) return;
@@ -467,6 +481,11 @@ class Client {
 		this.splitBufferAt(4);
 		console.log(this.matchCode);
 		this.match.handleRestart();
+	}
+	readPacketInfoRequest(){
+		setTimeout(()=>{
+			this.match.releaseTheClientsMidMatch(this);
+		}, 3000);
 	}
 }
 
@@ -605,6 +624,11 @@ class Match{
 
 		this.unlockInput();
 	}
+	releaseTheClientsMidMatch(client){
+		this.players.map((player)=>{
+			client.sock.write(MTGP.buildStartUpdatePacket(player, this));
+		});
+	}
 	unlockInput(){
 		//Delay the message so the clients can handle all the new players
 		//Should replace with a listerner where we wait for all players to return a ready message
@@ -638,6 +662,8 @@ class Match{
 		this.spectators.map((spec)=>{
 			spec.sock.write(MTGP.buildUpdate(client));
 		});
+
+		this.checkForWin();
 	}
 	handleRestart(){
 		console.log("["+this.code.toUpperCase()+"] Someone restarted the match");

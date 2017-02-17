@@ -10,6 +10,7 @@ package as3 {
 			bttnLoginContinue.addEventListener(MouseEvent.CLICK, handleLoginSubmit);
 			joinOptionsMenu.visible = false;
 			txtErrorMessage.visible = false;
+			//txtShowHost.visible = false;
 			trace("=============[Loaded Login Events]==============");
 		}
 		private function handleShowOptions(e:MouseEvent):void{

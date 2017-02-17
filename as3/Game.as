@@ -73,7 +73,7 @@ package as3 {
 		public static function startUpdate(playerID, health, infect, username, maxInfect):void{
 			//trace("I ran startUpdate in Game.as, but IDK if we are in the match yet...");
 			try{
-				//trace(playerID+"|"+health+"|"+infect+"|"+username+"|"+maxInfect);
+				trace(playerID+"|"+health+"|"+infect+"|"+username+"|"+maxInfect);
 				main.scene.startUpdate(playerID, health, infect, username, maxInfect);
 				}catch(e:Error){
 				}

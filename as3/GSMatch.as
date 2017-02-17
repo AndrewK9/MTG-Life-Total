@@ -29,7 +29,7 @@ package as3 {
 		var winnerObject;
 		var chatroomObject;
 
-		public function GSMatch(isPlayer:Boolean) {
+		public function GSMatch(isPlayer:Boolean, midMatch:Boolean) {
 			NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
 			if(!isPlayer){
 				bttnMinusHealth.visible = false;
@@ -47,6 +47,9 @@ package as3 {
 				chatroomObject.y = 744;
 				chatroomObject.bttnShowChat.addEventListener(MouseEvent.CLICK, handleToggleChat);
 				chatroomObject.inputChat.addEventListener(KeyboardEvent.KEY_DOWN, handleChatSubmit);
+			}
+			if(midMatch){
+				Game.socket.sendInfoRequest();
 			}
 			player = isPlayer;
 			trace("=============[Loaded Match Events]==============");
