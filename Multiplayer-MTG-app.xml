@@ -18,7 +18,7 @@
 -->
 <application xmlns="http://ns.adobe.com/air/application/23.0">
   <id>MultiplayerMagic</id>
-  <versionNumber>2.0.0</versionNumber>
+  <versionNumber>2.1.0</versionNumber>
   <versionLabel/>
   <filename>Multiplayer Magic</filename>
   <description/>
@@ -32,14 +32,24 @@
     <fullScreen>true</fullScreen>
     <aspectRatio>portrait</aspectRatio>
     <renderMode>cpu</renderMode>
-    <autoOrients>false</autoOrients></initialWindow>
+    <autoOrients>false</autoOrients>
+    <width>480</width>
+    <height>800</height>
+    <maximizable>true</maximizable>
+    <minimizable>true</minimizable>
+    <resizable>true</resizable>
+  </initialWindow>
   <icon>
-    <image36x36>images/icon-36.png</image36x36>
+    
+    
+    
+    
+    
+    
     <image48x48>images/icon-48.png</image48x48>
-    <image72x72>images/icon-72.png</image72x72>
-    <image96x96>images/icon-96.png</image96x96>
-    <image144x144>images/icon-144.png</image144x144>
-    <image192x192>images/icon-192.png</image192x192>
+    <image128x128>images/icon-128.png</image128x128>
+    <image32x32>images/icon-32.png</image32x32>
+    <image16x16>images/icon-16.png</image16x16>
   </icon>
   <customUpdateUI>false</customUpdateUI>
   <allowBrowserInvocation>false</allowBrowserInvocation>
