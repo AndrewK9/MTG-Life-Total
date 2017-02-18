@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## [2.1.1] - 2017-02-18
+### Added
+- New Icon.png images for desktop version.
+
+### Changed
+- Updated the APK and SWF files.
+- Updated the Google Play store link for the README file.
+
 ## [2.1.0] - 2017-02-17 [RELEASE]
 
 ## [2.0.4] - 2017-02-17
